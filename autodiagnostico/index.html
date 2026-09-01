@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autodiagnóstico — Evolution: High Performance Training</title>
+<style>
+  :root {
+    --navy-deep: #05070F;
+    --navy-mid: #0C1330;
+    --navy-base: #1A2B58;
+    --steel: #96A7DB;
+    --steel-dim: #6F7FA8;
+    --cream: #F3F0E9;
+    --cream-dim: #B8B4A8;
+    --orange: #FF7E20;
+    --orange-bright: #FF9640;
+    --orange-dim: #C9611A;
+    --border-soft: rgba(150, 167, 219, 0.14);
+    --border-orange: rgba(255, 126, 32, 0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy-deep);
+    color: var(--cream);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* ===== FONDO: plano ===== */
+
+  .wrap {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* ===== HEADER / PROGRESO ===== */
+  .test-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .test-logo {
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+  }
+  .test-logo .accent { color: var(--orange-bright); }
+  .test-progress-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--steel-dim);
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 3px;
+    border-radius: 3px;
+    background: rgba(150,167,219,0.12);
+    overflow: hidden;
+    margin-bottom: 44px;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--orange-dim), var(--orange-bright));
+    border-radius: 3px;
+    box-shadow: 0 0 12px rgba(255,126,32,0.5);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ===== PANTALLAS ===== */
+  .screen {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .screen.active {
+    display: block;
+    animation: screenIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .screen.leaving {
+    animation: screenOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+  @keyframes screenIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes screenOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+  }
+
+  /* ===== INTRO ===== */
+  .intro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 20px;
+    border: 1px solid rgba(150, 167, 219, 0.22);
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 28px;
+    background: rgba(6, 10, 24, 0.75);
+  }
+  .intro-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--orange); box-shadow: 0 0 8px var(--orange);
+  }
+
+  .intro h1 {
+    font-size: clamp(30px, 6vw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 18px;
+  }
+  .intro h1 .accent { color: var(--orange-bright); }
+  .intro p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--steel);
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+
+  /* ===== PREGUNTA ===== */
+  .q-number {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange-bright);
+    margin-bottom: 16px;
+  }
+  .q-text {
+    font-size: clamp(22px, 4.4vw, 28px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin-bottom: 30px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .option-btn {
+    text-align: left;
+    padding: 18px 22px;
+    border-radius: 14px;
+    border: 1px solid rgba(150,167,219,0.16);
+    background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.1));
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.45;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+  .option-btn:hover {
+    border-color: var(--border-orange);
+    background: linear-gradient(180deg, rgba(255,126,32,0.08), rgba(255,126,32,0.02));
+    transform: translateX(2px);
+  }
+  .option-letter {
+    flex-shrink: 0;
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    border: 1px solid rgba(150,167,219,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--steel);
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .option-btn:hover .option-letter {
+    border-color: var(--orange-bright);
+    color: var(--orange-bright);
+    background: rgba(255,126,32,0.1);
+  }
+
+  .q-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--steel-dim);
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+  .q-back:hover { color: var(--steel); }
+
+  /* ===== RESULTADO ===== */
+  .result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 20px;
+    border: 1px solid rgba(255,126,32,0.4);
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange-bright);
+    margin-bottom: 28px;
+    background: rgba(255,126,32,0.08);
+  }
+  .result-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--steel);
+    margin-bottom: 10px;
+  }
+  .result-title {
+    font-size: clamp(28px, 6vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--orange-bright);
+    margin-bottom: 24px;
+  }
+  .result-desc {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--cream-dim);
+    margin-bottom: 32px;
+  }
+
+  .result-panel {
+    border-radius: 20px;
+    border: 1px solid rgba(150, 167, 219, 0.16);
+    background: linear-gradient(165deg, rgba(16,23,51,0.85), rgba(5,7,15,0.9));
+    backdrop-filter: blur(14px);
+    padding: 28px;
+    margin-bottom: 32px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+  }
+  .result-panel-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange-bright);
+    margin-bottom: 14px;
+  }
+  .result-panel-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--cream);
+  }
+
+  .result-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 18px 28px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--orange-bright), var(--orange-dim));
+    color: #1A0E00;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 10px 30px -8px rgba(255,126,32,0.45);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 14px;
+  }
+  .result-cta:hover { transform: translateY(-2px); }
+
+  .result-retry {
+    display: block;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: var(--steel-dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+  }
+  .result-retry:hover { color: var(--steel); }
+
+  @media (max-width: 480px) {
+    .wrap { padding: 36px 20px 60px; }
+    .option-btn { padding: 16px 18px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="test-header">
+    <div class="test-logo">Evolution<span class="accent">.</span></div>
+    <div class="test-progress-label" id="progressLabel">Autodiagnóstico</div>
+  </div>
+
+  <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+
+  <!-- ===== PANTALLA: INTRO ===== -->
+  <div class="screen active" data-screen="intro">
+    <div class="intro-badge"><span class="dot"></span>Autodiagnóstico gratuito</div>
+    <h1 class="intro">¿Qué está frenando <span class="accent">tu alto desempeño?</span></h1>
+    <p>12 preguntas para identificar el patrón específico que te está costando más energía de la que ves — y qué hacer con eso.</p>
+    <button class="option-btn" id="startBtn" style="justify-content:center; font-weight:700; border-color:rgba(255,126,32,0.4);">Comenzar autodiagnóstico →</button>
+  </div>
+
+  <!-- ===== PANTALLAS DE PREGUNTAS (generadas por JS) ===== -->
+  <div id="questionsContainer"></div>
+
+  <!-- ===== PANTALLA: RESULTADO ===== -->
+  <div class="screen" data-screen="result">
+    <div class="result-badge">Tu resultado</div>
+    <div class="result-eyebrow">Tu patrón de alto desempeño es:</div>
+    <div class="result-title" id="resultTitle"></div>
+    <p class="result-desc" id="resultDesc"></p>
+
+    <div class="result-panel">
+      <div class="result-panel-label">Cómo lo trabajamos en Evolution</div>
+      <div class="result-panel-text" id="resultProgram"></div>
+    </div>
+
+    <a href="#" class="result-cta" id="resultCta" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.11c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.26-4.34c0-4.54 3.7-8.24 8.25-8.24 4.54 0 8.24 3.7 8.24 8.24 0 4.55-3.7 8.2-8.24 8.2zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.4-.12-.56.13-.17.25-.64.81-.78.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.15.16-.25.24-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43-.14-.01-.31-.01-.48-.01-.17 0-.44.06-.67.31-.23.25-.87.85-.87 2.08 0 1.22.89 2.4 1.01 2.57.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.17-.48-.29z"/></svg>
+      Quiero trabajar en esto
+    </a>
+    <button class="result-retry" id="retryBtn">Volver a hacer el test</button>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const WHATSAPP_NUMBER = '51997473509';
+
+  // ===== Preguntas: cada opción suma a un arquetipo (P, A, D, S) =====
+  const questions = [
+    {
+      text: "Terminas un proyecto grande y sale bien. ¿Cuál es tu primera reacción?",
+      options: [
+        { text: "Repaso todo lo que pude haber hecho mejor", type: "P" },
+        { text: "Alivio, pero ya estoy pensando en qué puede salir mal en el siguiente", type: "A" },
+        { text: "Satisfacción rápida, pero no sé bien para qué sirvió todo esto", type: "D" },
+        { text: "Lo celebro solo/a — no se me ocurre a quién contárselo primero", type: "S" }
+      ]
+    },
+    {
+      text: "Alguien te da una crítica sobre tu trabajo. ¿Qué pasa por tu cabeza?",
+      options: [
+        { text: "\"Tenía que haberlo visto yo antes de que me lo dijeran\"", type: "P" },
+        { text: "Reviso todo de nuevo, aunque la crítica sea menor", type: "A" },
+        { text: "La escucho, pero no me afecta tanto — ya nada me mueve mucho", type: "D" },
+        { text: "La proceso sola/o, rara vez la comento con alguien", type: "S" }
+      ]
+    },
+    {
+      text: "¿Cómo describirías tus últimas vacaciones o días libres?",
+      options: [
+        { text: "Seguí revisando trabajo \"por si acaso\"", type: "P" },
+        { text: "Me costó desconectar, la cabeza no paraba", type: "A" },
+        { text: "Estuvieron bien, pero volver tampoco me generó muchas ganas", type: "D" },
+        { text: "Descansé, pero mayormente solo/a", type: "S" }
+      ]
+    },
+    {
+      text: "Tienes que delegar una tarea importante. ¿Qué sientes?",
+      options: [
+        { text: "Prefiero hacerlo yo, así queda bien hecho", type: "P" },
+        { text: "Me cuesta soltar el control de cómo sale", type: "A" },
+        { text: "Me da un poco igual, no tengo tanta energía puesta en eso", type: "D" },
+        { text: "Delego la tarea, pero no pido ayuda con la carga emocional que conlleva", type: "S" }
+      ]
+    },
+    {
+      text: "¿Qué tan seguido sientes que \"nunca es suficiente\" con lo que logras?",
+      options: [
+        { text: "Casi siempre — el estándar sigue subiendo", type: "P" },
+        { text: "Cuando algo no sale como lo planeé", type: "A" },
+        { text: "Ya ni sé qué sería \"suficiente\" para mí", type: "D" },
+        { text: "Lo siento, pero no se lo digo a nadie", type: "S" }
+      ]
+    },
+    {
+      text: "Una decisión importante está por tomarse. ¿Cómo la enfrentas?",
+      options: [
+        { text: "Le doy mil vueltas para no equivocarme", type: "P" },
+        { text: "Analizo cada escenario posible antes de decidir", type: "A" },
+        { text: "A veces decido solo por salir del paso, sin mucha convicción", type: "D" },
+        { text: "La pienso yo solo/a, rara vez pido una segunda opinión", type: "S" }
+      ]
+    },
+    {
+      text: "¿Qué tan a menudo te preguntas \"para qué estoy haciendo todo esto\"?",
+      options: [
+        { text: "Casi nunca, estoy enfocado en hacerlo bien", type: "P" },
+        { text: "Cuando el estrés baja lo suficiente para pensarlo", type: "A" },
+        { text: "Constantemente, y no siempre tengo una respuesta clara", type: "D" },
+        { text: "A veces, pero lo resuelvo solo/a en mi cabeza", type: "S" }
+      ]
+    },
+    {
+      text: "Alguien cercano nota que estás cansado/a y te pregunta cómo estás. ¿Qué respondes?",
+      options: [
+        { text: "\"Bien, solo tengo mucho que hacer\"", type: "P" },
+        { text: "Minimizo — no quiero que se preocupen por algo que puedo manejar", type: "A" },
+        { text: "Le resto importancia, aunque por dentro sienta más", type: "D" },
+        { text: "Cambio de tema, prefiero no abrir esa conversación", type: "S" }
+      ]
+    },
+    {
+      text: "¿Cómo manejas un error que cometiste frente a otros?",
+      options: [
+        { text: "Me cuesta mucho perdonármelo, aunque nadie más le dé importancia", type: "P" },
+        { text: "Se me queda dando vueltas, repaso qué pudo haber salido distinto", type: "A" },
+        { text: "Lo dejo pasar rápido, casi no me remueve", type: "D" },
+        { text: "Lo resuelvo y sigo, sin comentarlo mucho con nadie", type: "S" }
+      ]
+    },
+    {
+      text: "¿Qué tan conectado/a te sientes con las personas que te importan últimamente?",
+      options: [
+        { text: "Poco — el trabajo se lleva la mayoría de mi energía", type: "P" },
+        { text: "Estoy presente, pero con la cabeza en otras cosas", type: "A" },
+        { text: "Conectado/a, aunque a veces siento que falta algo más profundo", type: "D" },
+        { text: "Menos de lo que me gustaría — me cuesta abrirme", type: "S" }
+      ]
+    },
+    {
+      text: "Cuando algo te sale mal, ¿a qué le echas la culpa primero?",
+      options: [
+        { text: "A mí — pude haberme esforzado más", type: "P" },
+        { text: "A no haber previsto todos los riesgos", type: "A" },
+        { text: "A que quizás esto ni era lo mío", type: "D" },
+        { text: "Prefiero no darle muchas vueltas con otros, lo resuelvo internamente", type: "S" }
+      ]
+    },
+    {
+      text: "Si pudieras cambiar una sola cosa de cómo vives tu alto desempeño, ¿cuál sería?",
+      options: [
+        { text: "Dejar de exigirme tanto sin perder mi nivel", type: "P" },
+        { text: "Encontrar calma sin sentir que pierdo el control", type: "A" },
+        { text: "Reconectar con un propósito que de verdad me mueva", type: "D" },
+        { text: "Poder compartir el peso con alguien más, sin sentir que fallo al pedirlo", type: "S" }
+      ]
+    }
+  ];
+
+  // ===== Perfiles de resultado =====
+  const profiles = {
+    P: {
+      title: "El Perfeccionista Agotado",
+      desc: "Tu estándar es altísimo — y por eso llegaste tan lejos. Pero también es la razón por la que nunca sientes que llegaste. Cada logro se disuelve rápido porque ya estás mirando el siguiente nivel de exigencia. No es que te falte disciplina: es que aprendiste que el error es intolerable, y esa creencia te está costando más energía de la que ves.",
+      program: "Trabajamos en separar tu valor de tu productividad, y en aprender a sostener tu estándar sin que te cueste la salud emocional."
+    },
+    A: {
+      title: "El Ansioso de Alto Rendimiento",
+      desc: "Controlas cada variable porque eso es lo que te da calma — hasta que deja de funcionar. Sobrepiensas las decisiones, anticipas los riesgos antes de que existan, y te cuesta soltar incluso cuando \"ya está resuelto\". Tu mente de alto rendimiento es un activo enorme, pero cuando trabaja en modo alerta constante, te agota antes de que el día termine.",
+      program: "Trabajamos en regular la ansiedad de raíz, no solo en gestionar sus síntomas."
+    },
+    D: {
+      title: "El Desconectado de Propósito",
+      desc: "Sigues rindiendo, pero el \"para qué\" se volvió borroso. Haces las cosas bien — por inercia, por hábito, por expectativa — pero la motivación que antes tenías se fue apagando sin que lo notaras. No es falta de capacidad, es que perdiste el hilo entre lo que haces y lo que realmente quieres construir.",
+      program: "Trabajamos en reconectar con una ambición que sea tuya, no heredada."
+    },
+    S: {
+      title: "El Solitario Funcional",
+      desc: "Resuelves todo — el trabajo, las decisiones, hasta el cansancio — completamente solo/a. Funciona, hasta que el peso se vuelve demasiado para cargarlo sin apoyo. Confundes autosuficiencia con fortaleza, y eso te está aislando justo en los momentos donde más ayuda necesitas.",
+      program: "Trabajamos en aprender a sostener tu alto desempeño sin tener que sostenerlo en soledad."
+    }
+  };
+
+  const totalQuestions = questions.length;
+  const scores = { P: 0, A: 0, D: 0, S: 0 };
+  let currentIndex = -1; // -1 = intro
+
+  const questionsContainer = document.getElementById('questionsContainer');
+  const progressBar = document.getElementById('progressBar');
+  const progressLabel = document.getElementById('progressLabel');
+
+  // Genera el HTML de cada pregunta dinámicamente
+  questions.forEach((q, qIndex) => {
+    const screen = document.createElement('div');
+    screen.className = 'screen';
+    screen.dataset.screen = 'question-' + qIndex;
+
+    const letters = ['A', 'B', 'C', 'D'];
+    const optionsHtml = q.options.map((opt, oIndex) =>
+      '<button class="option-btn" data-type="' + opt.type + '">' +
+        '<span class="option-letter">' + letters[oIndex] + '</span>' +
+        '<span>' + opt.text + '</span>' +
+      '</button>'
+    ).join('');
+
+    screen.innerHTML =
+      '<div class="q-number">Pregunta ' + (qIndex + 1) + ' de ' + totalQuestions + '</div>' +
+      '<div class="q-text">' + q.text + '</div>' +
+      '<div class="options">' + optionsHtml + '</div>' +
+      (qIndex > 0 ? '<button class="q-back" data-prev="' + (qIndex - 1) + '">← Volver</button>' : '');
+
+    questionsContainer.appendChild(screen);
+  });
+
+  function getAllScreens() {
+    return Array.from(document.querySelectorAll('.screen'));
+  }
+
+  function goToScreen(screenName) {
+    const screens = getAllScreens();
+    const current = screens.find(s => s.classList.contains('active'));
+    const next = screens.find(s => s.dataset.screen === screenName);
+    if (!next) return;
+
+    if (current) {
+      current.classList.add('leaving');
+      current.classList.remove('active');
+      setTimeout(() => {
+        current.classList.remove('leaving');
+        next.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 200);
+    } else {
+      next.classList.add('active');
+    }
+  }
+
+  function updateProgress(qIndex) {
+    if (qIndex < 0) {
+      progressBar.style.width = '0%';
+      progressLabel.textContent = 'Autodiagnóstico';
+    } else {
+      const pct = ((qIndex + 1) / totalQuestions) * 100;
+      progressBar.style.width = pct + '%';
+      progressLabel.textContent = (qIndex + 1) + ' / ' + totalQuestions;
+    }
+  }
+
+  // Botón de inicio
+  document.getElementById('startBtn').addEventListener('click', function() {
+    currentIndex = 0;
+    updateProgress(0);
+    goToScreen('question-0');
+  });
+
+  // Delegación de eventos para todas las opciones y botones de volver
+  questionsContainer.addEventListener('click', function(e) {
+    const optBtn = e.target.closest('.option-btn');
+    const backBtn = e.target.closest('.q-back');
+
+    if (optBtn) {
+      const type = optBtn.dataset.type;
+      scores[type] += 1;
+
+      if (currentIndex < totalQuestions - 1) {
+        currentIndex += 1;
+        updateProgress(currentIndex);
+        goToScreen('question-' + currentIndex);
+      } else {
+        showResult();
+      }
+    }
+
+    if (backBtn) {
+      const prevIndex = parseInt(backBtn.dataset.prev);
+      currentIndex = prevIndex;
+      updateProgress(currentIndex);
+      goToScreen('question-' + currentIndex);
+    }
+  });
+
+  function showResult() {
+    let topType = 'P';
+    let topScore = -1;
+    ['P', 'A', 'D', 'S'].forEach(type => {
+      if (scores[type] > topScore) {
+        topScore = scores[type];
+        topType = type;
+      }
+    });
+
+    const profile = profiles[topType];
+    document.getElementById('resultTitle').textContent = profile.title;
+    document.getElementById('resultDesc').textContent = profile.desc;
+    document.getElementById('resultProgram').textContent = profile.program;
+
+    const message = encodeURIComponent(
+      'Hola! Acabo de hacer el autodiagnóstico de Evolution y mi resultado fue: "' + profile.title + '". Quiero más información sobre el entrenamiento.'
+    );
+    document.getElementById('resultCta').setAttribute('href', 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + message);
+
+    progressBar.style.width = '100%';
+    progressLabel.textContent = 'Completado';
+    goToScreen('result');
+  }
+
+  document.getElementById('retryBtn').addEventListener('click', function() {
+    Object.keys(scores).forEach(k => scores[k] = 0);
+    currentIndex = -1;
+    updateProgress(-1);
+    goToScreen('intro');
+  });
+})();
+</script>
+
+</body>
+</html>
