@@ -385,6 +385,50 @@
 
   .step-video { max-width: 100%; margin: 0; }
 
+  /* ===== Tu calendario de sesiones (Paso 3) ===== */
+  .calendar-block {
+    margin-bottom: 28px; padding: 26px 26px 24px; border-radius: 18px; max-width: 480px;
+    border: 1px solid rgba(150,167,219,0.16);
+    background: linear-gradient(165deg, rgba(16,23,51,0.55), rgba(5,7,15,0.5));
+  }
+  .calendar-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; }
+  .calendar-icon {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 11px;
+    background: rgba(255,126,32,0.1); border: 1px solid rgba(255,126,32,0.28);
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .calendar-title { font-size: 16px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .calendar-subtitle {
+    font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 300; color: var(--steel); line-height: 1.5;
+  }
+
+  .calendar-selectors { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .calendar-field label {
+    display: block; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--steel-dim); margin-bottom: 8px;
+  }
+  .calendar-field select {
+    width: 100%; padding: 12px 34px 12px 14px; border-radius: 11px;
+    border: 1px solid rgba(150,167,219,0.22); background-color: rgba(5,7,15,0.6);
+    color: var(--cream); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2396A7DB' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    transition: border-color 0.2s ease;
+  }
+  .calendar-field select:focus { outline: none; border-color: var(--orange); }
+  .calendar-field select option { background: var(--navy-mid); color: var(--cream); }
+
+  .calendar-result {
+    padding: 16px 18px; border-radius: 13px;
+    background: rgba(255,126,32,0.08); border: 1px solid rgba(255,126,32,0.28);
+  }
+  .calendar-result-week {
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+    color: var(--orange-bright); margin-bottom: 6px;
+  }
+  .calendar-result-time { font-size: 15.5px; font-weight: 700; letter-spacing: -0.01em; color: var(--cream); }
+
   /* ===== Selector de modalidad (Paso 3) ===== */
   .modality-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
   .modality-tab {
@@ -468,6 +512,8 @@
     .step-marker-num { width: 40px; height: 40px; font-size: 16px; }
     .step-ctas { flex-direction: column; }
     .step-ctas a, .step-ctas button { width: 100%; justify-content: center; }
+    .calendar-block { padding: 22px 20px 20px; }
+    .calendar-selectors { grid-template-columns: 1fr; }
   }
 
   /* ===== CTA FINAL ===== */
@@ -588,7 +634,57 @@
       <div class="step-content">
         <div class="step-label">Paso 3</div>
         <h3 class="step-title">Da el siguiente paso</h3>
-        <p class="step-desc">Si ya viste suficiente, elige cómo quieres avanzar.</p>
+        <p class="step-desc">Empieza el miércoles 23 de septiembre de 2026. Si ya viste suficiente, elige cómo quieres avanzar.</p>
+
+        <!-- Tu calendario de sesiones — dos selects (semana + país) que
+             arman en vivo la fecha/hora real de esa sesión con
+             Intl.DateTimeFormat + timeZone (nunca una tabla de horarios a
+             mano, así el horario de verano de España/EEUU se ajusta
+             solo). La hora base es siempre 7:00 PM hora Perú
+             (America/Lima, sin horario de verano) — ver WEEKS y
+             formatSessionDateTime() en el script al final del archivo. -->
+        <div class="calendar-block">
+          <div class="calendar-header">
+            <div class="calendar-icon">📅</div>
+            <div>
+              <div class="calendar-title">Tu calendario de sesiones</div>
+              <div class="calendar-subtitle">8 semanas en vivo, todos los miércoles — empieza el 23 de septiembre de 2026.</div>
+            </div>
+          </div>
+
+          <div class="calendar-selectors">
+            <div class="calendar-field">
+              <label for="weekSelect">Elige tu sesión</label>
+              <select id="weekSelect">
+                <option value="0" selected>Semana 1 — Mentalidad de Evolución</option>
+                <option value="1">Semana 2 — Autoestima Evolutiva</option>
+                <option value="2">Semana 3 — Ansiedad y Control</option>
+                <option value="3">Semana 4 — Propósito y Ambición Saludable</option>
+                <option value="4">Semana 5 — Relaciones y Asertividad</option>
+                <option value="5">Semana 6 — Disciplina y Resiliencia</option>
+                <option value="6">Semana 7 — Vínculos y Conexión</option>
+                <option value="7">Semana 8 — Integración</option>
+              </select>
+            </div>
+            <div class="calendar-field">
+              <label for="tzSelect">Estoy en</label>
+              <select id="tzSelect">
+                <option value="America/Lima" selected>Perú</option>
+                <option value="America/Bogota">Resto de Latinoamérica</option>
+                <option value="America/Mexico_City">México</option>
+                <option value="America/Argentina/Buenos_Aires">Argentina/Chile</option>
+                <option value="Europe/Madrid">España</option>
+                <option value="America/New_York">Estados Unidos - Este</option>
+                <option value="America/Los_Angeles">Estados Unidos - Oeste</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calendar-result">
+            <div class="calendar-result-week" id="calendarResultWeek">Semana 1 — Mentalidad de Evolución</div>
+            <div class="calendar-result-time" id="calendarResultTime">🕖 Miércoles 23 de septiembre, 7:00 p.m. (hora Perú)</div>
+          </div>
+        </div>
 
         <!-- Selector de modalidad — cambia todo el bloque de abajo (qué
              incluye queda fijo, precio/nota/botón/oferta de Hotmart
@@ -844,6 +940,80 @@
 <footer class="footer">
   Evolution: High Performance Training — Erick Castellano
 </footer>
+
+<script>
+  // ===== Paso 3: "Tu calendario de sesiones" =====
+  // Fecha calendario + 7:00 PM hora Perú (America/Lima, sin horario de
+  // verano) son fijos por semana — lo único que cambia según el país
+  // elegido es la hora mostrada, recalculada con Intl.DateTimeFormat +
+  // timeZone (nunca una tabla de horarios a mano), así el horario de
+  // verano de España/EEUU se ajusta solo en cada consulta.
+  (function () {
+    const WEEKS = [
+      { label: 'Semana 1', topic: 'Mentalidad de Evolución', year: 2026, month: 9, day: 23 },
+      { label: 'Semana 2', topic: 'Autoestima Evolutiva', year: 2026, month: 9, day: 30 },
+      { label: 'Semana 3', topic: 'Ansiedad y Control', year: 2026, month: 10, day: 7 },
+      { label: 'Semana 4', topic: 'Propósito y Ambición Saludable', year: 2026, month: 10, day: 14 },
+      { label: 'Semana 5', topic: 'Relaciones y Asertividad', year: 2026, month: 10, day: 21 },
+      { label: 'Semana 6', topic: 'Disciplina y Resiliencia', year: 2026, month: 10, day: 28 },
+      { label: 'Semana 7', topic: 'Vínculos y Conexión', year: 2026, month: 11, day: 4 },
+      { label: 'Semana 8', topic: 'Integración', year: 2026, month: 11, day: 11 }
+    ];
+
+    function getPart(parts, type) {
+      const p = parts.find(function (p) { return p.type === type; });
+      return p ? p.value : '';
+    }
+
+    // La fecha/hora base de cada semana es siempre 19:00 en America/Lima
+    // (UTC-5 todo el año, sin horario de verano) — sumar 5h a las 19:00 da
+    // directamente el instante UTC real, sin depender de ninguna tabla de
+    // huso horario a mano.
+    function sessionInstant(week) {
+      return new Date(Date.UTC(week.year, week.month - 1, week.day, 19 + 5, 0, 0));
+    }
+
+    function formatSessionDateTime(week, timeZone) {
+      const instant = sessionInstant(week);
+
+      const dateParts = new Intl.DateTimeFormat('es', {
+        timeZone: timeZone, weekday: 'long', day: 'numeric', month: 'long'
+      }).formatToParts(instant);
+      const timeParts = new Intl.DateTimeFormat('en-US', {
+        timeZone: timeZone, hour: 'numeric', minute: '2-digit', hourCycle: 'h23'
+      }).formatToParts(instant);
+
+      const weekday = getPart(dateParts, 'weekday');
+      const weekdayCap = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+      const day = getPart(dateParts, 'day');
+      const month = getPart(dateParts, 'month');
+      const hour24 = parseInt(getPart(timeParts, 'hour'), 10);
+      const minute = getPart(timeParts, 'minute');
+      const ampm = hour24 < 12 ? 'a.m.' : 'p.m.';
+      const hour12 = ((hour24 + 11) % 12) + 1;
+
+      return weekdayCap + ' ' + day + ' de ' + month + ', ' + hour12 + ':' + minute + ' ' + ampm;
+    }
+
+    const weekSelect = document.getElementById('weekSelect');
+    const tzSelect = document.getElementById('tzSelect');
+    const resultWeekEl = document.getElementById('calendarResultWeek');
+    const resultTimeEl = document.getElementById('calendarResultTime');
+
+    function renderCalendarResult() {
+      const week = WEEKS[parseInt(weekSelect.value, 10)];
+      const timeZone = tzSelect.value;
+      const countryLabel = tzSelect.options[tzSelect.selectedIndex].text;
+
+      resultWeekEl.textContent = week.label + ' — ' + week.topic;
+      resultTimeEl.textContent = '🕖 ' + formatSessionDateTime(week, timeZone) + ' (hora ' + countryLabel + ')';
+    }
+
+    weekSelect.addEventListener('change', renderCalendarResult);
+    tzSelect.addEventListener('change', renderCalendarResult);
+    renderCalendarResult();
+  })();
+</script>
 
 <script>
   // ===== Paso 3: selector de modalidad + checkout embebido de Hotmart =====
