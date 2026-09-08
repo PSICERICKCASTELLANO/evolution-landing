@@ -402,7 +402,8 @@
     font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 300; color: var(--steel); line-height: 1.5;
   }
 
-  .calendar-selectors { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .calendar-field { margin-bottom: 20px; }
+  .calendar-field-tz { max-width: 260px; }
   .calendar-field label {
     display: block; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--steel-dim); margin-bottom: 8px;
@@ -419,9 +420,24 @@
   .calendar-field select:focus { outline: none; border-color: var(--orange); }
   .calendar-field select option { background: var(--navy-mid); color: var(--cream); }
 
+  .calendar-stepper { display: flex; align-items: center; gap: 12px; }
+  .calendar-arrow {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid rgba(150,167,219,0.24); background: rgba(150,167,219,0.06);
+    color: var(--cream); font-size: 19px; font-weight: 700; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  }
+  .calendar-arrow:hover:not(:disabled) { border-color: var(--orange); color: var(--orange-bright); }
+  .calendar-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+
   .calendar-result {
-    padding: 16px 18px; border-radius: 13px;
+    flex: 1; min-width: 0; padding: 16px 18px; border-radius: 13px;
     background: rgba(255,126,32,0.08); border: 1px solid rgba(255,126,32,0.28);
+  }
+  .calendar-result-progress {
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--steel-dim); margin-bottom: 8px;
   }
   .calendar-result-week {
     font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
@@ -513,7 +529,8 @@
     .step-ctas { flex-direction: column; }
     .step-ctas a, .step-ctas button { width: 100%; justify-content: center; }
     .calendar-block { padding: 22px 20px 20px; }
-    .calendar-selectors { grid-template-columns: 1fr; }
+    .calendar-arrow { width: 34px; height: 34px; font-size: 16px; }
+    .calendar-stepper { gap: 8px; }
   }
 
   /* ===== CTA FINAL ===== */
@@ -634,55 +651,47 @@
       <div class="step-content">
         <div class="step-label">Paso 3</div>
         <h3 class="step-title">Da el siguiente paso</h3>
-        <p class="step-desc">Empieza el miércoles 23 de septiembre de 2026. Si ya viste suficiente, elige cómo quieres avanzar.</p>
 
-        <!-- Tu calendario de sesiones — dos selects (semana + país) que
-             arman en vivo la fecha/hora real de esa sesión con
-             Intl.DateTimeFormat + timeZone (nunca una tabla de horarios a
-             mano, así el horario de verano de España/EEUU se ajusta
-             solo). La hora base es siempre 7:00 PM hora Perú
-             (America/Lima, sin horario de verano) — ver WEEKS y
-             formatSessionDateTime() en el script al final del archivo. -->
+        <!-- Iniciamos el ... / calendario de sesiones — "Estoy en" (país)
+             va primero; abajo, un carrusel con flechas recorre las 8
+             semanas (arranca en la 1) y arma en vivo la fecha/hora real
+             de esa sesión con Intl.DateTimeFormat + timeZone (nunca una
+             tabla de horarios a mano, así el horario de verano de
+             EEUU/Chile se ajusta solo). La hora base es siempre 7:00 PM
+             hora Perú (America/Lima, sin horario de verano) — ver WEEKS
+             y formatSessionDateTime() en el script al final del
+             archivo. -->
         <div class="calendar-block">
           <div class="calendar-header">
             <div class="calendar-icon">📅</div>
             <div>
-              <div class="calendar-title">Tu calendario de sesiones</div>
-              <div class="calendar-subtitle">8 semanas en vivo, todos los miércoles — empieza el 23 de septiembre de 2026.</div>
+              <div class="calendar-title">Iniciamos el miércoles 23 de setiembre</div>
+              <div class="calendar-subtitle">8 semanas en vivo, todos los miércoles</div>
             </div>
           </div>
 
-          <div class="calendar-selectors">
-            <div class="calendar-field">
-              <label for="weekSelect">Elige tu sesión</label>
-              <select id="weekSelect">
-                <option value="0" selected>Semana 1 — Mentalidad de Evolución</option>
-                <option value="1">Semana 2 — Autoestima Evolutiva</option>
-                <option value="2">Semana 3 — Ansiedad y Control</option>
-                <option value="3">Semana 4 — Propósito y Ambición Saludable</option>
-                <option value="4">Semana 5 — Relaciones y Asertividad</option>
-                <option value="5">Semana 6 — Disciplina y Resiliencia</option>
-                <option value="6">Semana 7 — Vínculos y Conexión</option>
-                <option value="7">Semana 8 — Integración</option>
-              </select>
-            </div>
-            <div class="calendar-field">
-              <label for="tzSelect">Estoy en</label>
-              <select id="tzSelect">
-                <option value="America/Lima" selected>Perú</option>
-                <option value="America/Bogota">Resto de Latinoamérica</option>
-                <option value="America/Mexico_City">México</option>
-                <option value="America/Argentina/Buenos_Aires">Argentina/Chile</option>
-                <option value="Europe/Madrid">España</option>
-                <option value="America/New_York">Estados Unidos - Este</option>
-                <option value="America/Los_Angeles">Estados Unidos - Oeste</option>
-              </select>
-            </div>
+          <div class="calendar-field calendar-field-tz">
+            <label for="tzSelect">Estoy en</label>
+            <select id="tzSelect">
+              <option value="America/Lima" selected>Perú</option>
+              <option value="America/Santiago">Chile</option>
+              <option value="America/Bogota">Colombia</option>
+              <option value="America/Guayaquil">Ecuador</option>
+              <option value="America/Argentina/Buenos_Aires">Argentina</option>
+              <option value="America/Mexico_City">México</option>
+              <option value="America/New_York">Estados Unidos - Este</option>
+              <option value="America/Los_Angeles">Estados Unidos - Oeste</option>
+            </select>
           </div>
 
-          <div class="calendar-result">
-            <div class="calendar-result-week" id="calendarResultWeek">Semana 1 — Mentalidad de Evolución</div>
-            <div class="calendar-result-time" id="calendarResultTime">🕖 Miércoles 23 de septiembre, 7:00 p.m. (hora Perú)</div>
+          <div class="calendar-stepper">
+            <button type="button" class="calendar-arrow" id="weekPrev" aria-label="Sesión anterior">‹</button>
+            <div class="calendar-result">
+              <div class="calendar-result-progress" id="calendarResultProgress">Sesión 1 de 8</div>
+              <div class="calendar-result-week" id="calendarResultWeek">Semana 1 — Mentalidad de Evolución</div>
+              <div class="calendar-result-time" id="calendarResultTime">🕖 Miércoles 23 de septiembre, 7:00 p.m. (hora Perú)</div>
+            </div>
+            <button type="button" class="calendar-arrow" id="weekNext" aria-label="Siguiente sesión">›</button>
           </div>
         </div>
 
@@ -995,21 +1004,34 @@
       return weekdayCap + ' ' + day + ' de ' + month + ', ' + hour12 + ':' + minute + ' ' + ampm;
     }
 
-    const weekSelect = document.getElementById('weekSelect');
     const tzSelect = document.getElementById('tzSelect');
+    const prevBtn = document.getElementById('weekPrev');
+    const nextBtn = document.getElementById('weekNext');
+    const progressEl = document.getElementById('calendarResultProgress');
     const resultWeekEl = document.getElementById('calendarResultWeek');
     const resultTimeEl = document.getElementById('calendarResultTime');
 
+    let currentWeek = 0; // arranca en la Sesión 1
+
     function renderCalendarResult() {
-      const week = WEEKS[parseInt(weekSelect.value, 10)];
+      const week = WEEKS[currentWeek];
       const timeZone = tzSelect.value;
       const countryLabel = tzSelect.options[tzSelect.selectedIndex].text;
 
+      progressEl.textContent = 'Sesión ' + (currentWeek + 1) + ' de ' + WEEKS.length;
       resultWeekEl.textContent = week.label + ' — ' + week.topic;
       resultTimeEl.textContent = '🕖 ' + formatSessionDateTime(week, timeZone) + ' (hora ' + countryLabel + ')';
+
+      prevBtn.disabled = currentWeek === 0;
+      nextBtn.disabled = currentWeek === WEEKS.length - 1;
     }
 
-    weekSelect.addEventListener('change', renderCalendarResult);
+    prevBtn.addEventListener('click', function () {
+      if (currentWeek > 0) { currentWeek--; renderCalendarResult(); }
+    });
+    nextBtn.addEventListener('click', function () {
+      if (currentWeek < WEEKS.length - 1) { currentWeek++; renderCalendarResult(); }
+    });
     tzSelect.addEventListener('change', renderCalendarResult);
     renderCalendarResult();
   })();
