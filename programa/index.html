@@ -350,6 +350,10 @@
   }
 
   /* ===== SISTEMA DE 3 PASOS ===== */
+  /* Más ancha que el resto de las secciones (section-narrow, 720px) —
+     el Paso 3 necesita el espacio extra para el calendario y "qué
+     incluye + precio" en 2 columnas en escritorio (ver .paso3-grid). */
+  .steps-section { max-width: 900px; }
   .steps-flow { margin-top: 48px; }
 
   .step-block {
@@ -384,6 +388,11 @@
   }
 
   .step-video { max-width: 100%; margin: 0; }
+
+  /* En escritorio, calendario + (modalidad/qué incluye/precio) van uno
+     al lado del otro — en móvil (ver @media 860px) uno debajo del otro,
+     igual que estaba. */
+  .paso3-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
 
   /* ===== Tu calendario de sesiones (Paso 3) ===== */
   .calendar-block {
@@ -555,6 +564,7 @@
     .deliverables-grid { grid-template-columns: 1fr 1fr; }
     .framework-flow { grid-template-columns: 1fr; gap: 16px; }
     .framework-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .paso3-grid { grid-template-columns: 1fr; gap: 0; }
   }
   @media (max-width: 560px) {
     .deliverables-grid { grid-template-columns: 1fr; }
@@ -594,7 +604,7 @@
 <div class="section"><div class="divider" style="margin: 56px 0;"></div></div>
 
 <!-- ============ SISTEMA DE 3 PASOS (continúa desde el Paso 2) ============ -->
-<section class="section section-narrow">
+<section class="section section-narrow steps-section">
   <div class="steps-flow">
 
     <!-- PASO 2 -->
@@ -652,90 +662,104 @@
         <div class="step-label">Paso 3</div>
         <h3 class="step-title">Da el siguiente paso</h3>
 
-        <!-- Iniciamos el ... / calendario de sesiones — "Estoy en" (país)
-             va primero; abajo, un carrusel con flechas recorre las 8
-             semanas (arranca en la 1) y arma en vivo la fecha/hora real
-             de esa sesión con Intl.DateTimeFormat + timeZone (nunca una
-             tabla de horarios a mano, así el horario de verano de
-             EEUU/Chile se ajusta solo). La hora base es siempre 7:00 PM
-             hora Perú (America/Lima, sin horario de verano) — ver WEEKS
-             y formatSessionDateTime() en el script al final del
-             archivo. -->
-        <div class="calendar-block">
-          <div class="calendar-header">
-            <div class="calendar-icon">📅</div>
-            <div>
-              <div class="calendar-title">Iniciamos el miércoles 23 de setiembre</div>
-              <div class="calendar-subtitle">8 semanas en vivo, todos los miércoles</div>
+        <!-- En escritorio, calendario y "qué incluye + precio" van uno al
+             lado del otro (.paso3-grid, 2 columnas); en móvil, uno debajo
+             del otro (ver @media 860px). -->
+        <div class="paso3-grid">
+
+          <!-- Columna izquierda: Iniciamos el ... / calendario de sesiones
+               — "Estoy en" (país) va primero; abajo, un carrusel con
+               flechas recorre las 8 semanas (arranca en la 1) y arma en
+               vivo la fecha/hora real de esa sesión con
+               Intl.DateTimeFormat + timeZone (nunca una tabla de horarios
+               a mano, así el horario de verano de EEUU/Chile se ajusta
+               solo). La hora base es siempre 7:00 PM hora Perú
+               (America/Lima, sin horario de verano) — ver WEEKS y
+               formatSessionDateTime() en el script al final del
+               archivo. -->
+          <div class="paso3-col">
+            <div class="calendar-block">
+              <div class="calendar-header">
+                <div class="calendar-icon">📅</div>
+                <div>
+                  <div class="calendar-title">Iniciamos el miércoles 23 de setiembre</div>
+                  <div class="calendar-subtitle">8 semanas en vivo, todos los miércoles</div>
+                </div>
+              </div>
+
+              <div class="calendar-field calendar-field-tz">
+                <label for="tzSelect">Estoy en</label>
+                <select id="tzSelect">
+                  <option value="America/Lima" selected>Perú</option>
+                  <option value="America/Santiago">Chile</option>
+                  <option value="America/Bogota">Colombia</option>
+                  <option value="America/Guayaquil">Ecuador</option>
+                  <option value="America/Argentina/Buenos_Aires">Argentina</option>
+                  <option value="America/Mexico_City">México</option>
+                  <option value="America/New_York">Estados Unidos - Este</option>
+                  <option value="America/Los_Angeles">Estados Unidos - Oeste</option>
+                </select>
+              </div>
+
+              <div class="calendar-stepper">
+                <button type="button" class="calendar-arrow" id="weekPrev" aria-label="Sesión anterior">‹</button>
+                <div class="calendar-result">
+                  <div class="calendar-result-progress" id="calendarResultProgress">Sesión 1 de 8</div>
+                  <div class="calendar-result-week" id="calendarResultWeek">Semana 1 — Mentalidad de Evolución</div>
+                  <div class="calendar-result-time" id="calendarResultTime">🕖 Miércoles 23 de septiembre, 7:00 p.m. (hora Perú)</div>
+                </div>
+                <button type="button" class="calendar-arrow" id="weekNext" aria-label="Siguiente sesión">›</button>
+              </div>
             </div>
           </div>
 
-          <div class="calendar-field calendar-field-tz">
-            <label for="tzSelect">Estoy en</label>
-            <select id="tzSelect">
-              <option value="America/Lima" selected>Perú</option>
-              <option value="America/Santiago">Chile</option>
-              <option value="America/Bogota">Colombia</option>
-              <option value="America/Guayaquil">Ecuador</option>
-              <option value="America/Argentina/Buenos_Aires">Argentina</option>
-              <option value="America/Mexico_City">México</option>
-              <option value="America/New_York">Estados Unidos - Este</option>
-              <option value="America/Los_Angeles">Estados Unidos - Oeste</option>
-            </select>
-          </div>
-
-          <div class="calendar-stepper">
-            <button type="button" class="calendar-arrow" id="weekPrev" aria-label="Sesión anterior">‹</button>
-            <div class="calendar-result">
-              <div class="calendar-result-progress" id="calendarResultProgress">Sesión 1 de 8</div>
-              <div class="calendar-result-week" id="calendarResultWeek">Semana 1 — Mentalidad de Evolución</div>
-              <div class="calendar-result-time" id="calendarResultTime">🕖 Miércoles 23 de septiembre, 7:00 p.m. (hora Perú)</div>
+          <!-- Columna derecha: modalidad + qué incluye + precio + CTAs +
+               checkout de Hotmart. -->
+          <div class="paso3-col">
+            <!-- Selector de modalidad — cambia todo el bloque de abajo (qué
+                 incluye queda fijo, precio/nota/botón/oferta de Hotmart
+                 cambian). Ver script al final del archivo (objeto MODALITIES). -->
+            <div class="modality-tabs" role="tablist" aria-label="Modalidad de inscripción">
+              <button type="button" class="modality-tab active" data-modality="individual" role="tab" aria-selected="true">Individual</button>
+              <button type="button" class="modality-tab" data-modality="duo" role="tab" aria-selected="false">Somos 2 personas</button>
+              <button type="button" class="modality-tab" data-modality="trio" role="tab" aria-selected="false">Somos 3 personas</button>
             </div>
-            <button type="button" class="calendar-arrow" id="weekNext" aria-label="Siguiente sesión">›</button>
+
+            <!-- Qué incluye — mismo contenido en las 3 modalidades -->
+            <div class="includes-block">
+              <div class="includes-title">Qué incluye</div>
+              <ul class="includes-list">
+                <li><span class="mark">✓</span>8 semanas de sesiones en vivo con Erick y tu grupo</li>
+                <li><span class="mark">✓</span>Material audiovisual: un video formativo por módulo</li>
+                <li><span class="mark">✓</span>Ejercicios y retos prácticos cada semana</li>
+                <li><span class="mark">✓</span>Tu Mapa de Propósito, en 3 capas</li>
+                <li><span class="mark">✓</span>Tu Plan Personal de Disciplina</li>
+                <li><span class="mark">✓</span>Tu Manifiesto Personal de cierre</li>
+              </ul>
+            </div>
+
+            <div class="price-block step-price-block">
+              <span class="price-old" id="modalityPriceOld">$850</span>
+              <span class="price-new-wrap">
+                <span class="price-new" id="modalityPriceNew">$550</span>
+                <span class="price-per" id="modalityPricePer" hidden>/persona</span>
+              </span>
+              <span class="price-tag" id="modalityPriceTag">PREVENTA</span>
+            </div>
+
+            <div class="hero-ctas step-ctas">
+              <button type="button" class="btn-primary" id="modalityBuyBtn">Reservar mi plaza →</button>
+              <a href="https://wa.me/51997473509?text=Quiero%20agendar%20una%20sesi%C3%B3n%20de%20orientaci%C3%B3n%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Agendar orientación →</a>
+            </div>
+
+            <p class="hero-plazas" id="modalityNote">Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.</p>
+
+            <!-- Checkout embebido de Hotmart — vacío/oculto hasta que se
+                 hace clic en "Reservar", para no cargar 3 checkouts a la vez. -->
+            <div id="inline_checkout" class="hotmart-checkout-wrap" hidden></div>
           </div>
+
         </div>
-
-        <!-- Selector de modalidad — cambia todo el bloque de abajo (qué
-             incluye queda fijo, precio/nota/botón/oferta de Hotmart
-             cambian). Ver script al final del archivo (objeto MODALITIES). -->
-        <div class="modality-tabs" role="tablist" aria-label="Modalidad de inscripción">
-          <button type="button" class="modality-tab active" data-modality="individual" role="tab" aria-selected="true">Individual</button>
-          <button type="button" class="modality-tab" data-modality="duo" role="tab" aria-selected="false">Somos 2 personas</button>
-          <button type="button" class="modality-tab" data-modality="trio" role="tab" aria-selected="false">Somos 3 personas</button>
-        </div>
-
-        <!-- Qué incluye — mismo contenido en las 3 modalidades -->
-        <div class="includes-block">
-          <div class="includes-title">Qué incluye</div>
-          <ul class="includes-list">
-            <li><span class="mark">✓</span>8 semanas de sesiones en vivo con Erick y tu grupo</li>
-            <li><span class="mark">✓</span>Material audiovisual: un video formativo por módulo</li>
-            <li><span class="mark">✓</span>Ejercicios y retos prácticos cada semana</li>
-            <li><span class="mark">✓</span>Tu Mapa de Propósito, en 3 capas</li>
-            <li><span class="mark">✓</span>Tu Plan Personal de Disciplina</li>
-            <li><span class="mark">✓</span>Tu Manifiesto Personal de cierre</li>
-          </ul>
-        </div>
-
-        <div class="price-block step-price-block">
-          <span class="price-old" id="modalityPriceOld">$850</span>
-          <span class="price-new-wrap">
-            <span class="price-new" id="modalityPriceNew">$550</span>
-            <span class="price-per" id="modalityPricePer" hidden>/persona</span>
-          </span>
-          <span class="price-tag" id="modalityPriceTag">PREVENTA</span>
-        </div>
-
-        <div class="hero-ctas step-ctas">
-          <button type="button" class="btn-primary" id="modalityBuyBtn">Reservar mi plaza →</button>
-          <a href="https://wa.me/51997473509?text=Quiero%20agendar%20una%20sesi%C3%B3n%20de%20orientaci%C3%B3n%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Agendar orientación →</a>
-        </div>
-
-        <p class="hero-plazas" id="modalityNote">Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.</p>
-
-        <!-- Checkout embebido de Hotmart — vacío/oculto hasta que se
-             hace clic en "Reservar", para no cargar 3 checkouts a la vez. -->
-        <div id="inline_checkout" class="hotmart-checkout-wrap" hidden></div>
       </div>
     </div>
 
