@@ -385,6 +385,57 @@
 
   .step-video { max-width: 100%; margin: 0; }
 
+  /* ===== Selector de modalidad (Paso 3) ===== */
+  .modality-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .modality-tab {
+    padding: 11px 20px; border-radius: 999px; border: 1px solid rgba(150,167,219,0.22);
+    background: rgba(150,167,219,0.05); color: var(--steel);
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .modality-tab:hover { border-color: var(--steel); color: var(--cream); }
+  .modality-tab.active {
+    background: linear-gradient(180deg, var(--orange-bright), var(--orange-dim));
+    border-color: transparent; color: #1A0E00;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 20px -6px rgba(255,126,32,0.5);
+  }
+
+  /* Qué incluye — fijo entre las 3 modalidades */
+  .includes-block {
+    margin-bottom: 24px; padding: 22px 24px; border-radius: 16px; max-width: 460px;
+    border: 1px solid rgba(150,167,219,0.14);
+    background: linear-gradient(165deg, rgba(16,23,51,0.5), rgba(5,7,15,0.45));
+  }
+  .includes-title {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--orange-bright); margin-bottom: 14px;
+  }
+  .includes-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .includes-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.5; color: var(--cream-dim); font-weight: 300;
+  }
+  .includes-list .mark {
+    flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; margin-top: 1px;
+    background: rgba(255,126,32,0.12); border: 1px solid var(--border-orange); color: var(--orange-bright);
+    display: flex; align-items: center; justify-content: center; font-size: 10px;
+  }
+
+  /* Precio "por persona" (Dúo/Trío) */
+  .price-new-wrap { display: inline-flex; align-items: baseline; gap: 5px; }
+  .price-per { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--steel-dim); }
+
+  /* Checkout embebido de Hotmart */
+  .hotmart-checkout-wrap {
+    margin-top: 8px; margin-bottom: 18px; border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(150,167,219,0.18); background: var(--navy-mid); min-height: 480px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hotmart-checkout-wrap[hidden] { display: none; }
+  .checkout-loading {
+    font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--steel); text-align: center; padding: 24px;
+  }
+
   /* Grid de videos-placeholder del Paso 2 */
   .faq-video-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
@@ -416,7 +467,7 @@
     .step-block { grid-template-columns: 40px 1fr; gap: 16px; }
     .step-marker-num { width: 40px; height: 40px; font-size: 16px; }
     .step-ctas { flex-direction: column; }
-    .step-ctas a { width: 100%; justify-content: center; }
+    .step-ctas a, .step-ctas button { width: 100%; justify-content: center; }
   }
 
   /* ===== CTA FINAL ===== */
@@ -455,7 +506,7 @@
 <nav class="nav">
   <div class="nav-inner">
     <div class="nav-logo">Evolution<span class="accent">.</span></div>
-    <a href="#paso-3" class="nav-cta">Ir al paso 3</a>
+    <a href="#paso-3" class="nav-cta">Reservar mi plaza</a>
   </div>
 </nav>
 
@@ -537,20 +588,49 @@
       <div class="step-content">
         <div class="step-label">Paso 3</div>
         <h3 class="step-title">Da el siguiente paso</h3>
-        <p class="step-desc">Si ya viste suficiente, aquí tienes las dos formas de avanzar.</p>
+        <p class="step-desc">Si ya viste suficiente, elige cómo quieres avanzar.</p>
+
+        <!-- Selector de modalidad — cambia todo el bloque de abajo (qué
+             incluye queda fijo, precio/nota/botón/oferta de Hotmart
+             cambian). Ver script al final del archivo (objeto MODALITIES). -->
+        <div class="modality-tabs" role="tablist" aria-label="Modalidad de inscripción">
+          <button type="button" class="modality-tab active" data-modality="individual" role="tab" aria-selected="true">Individual</button>
+          <button type="button" class="modality-tab" data-modality="duo" role="tab" aria-selected="false">Somos 2 personas</button>
+          <button type="button" class="modality-tab" data-modality="trio" role="tab" aria-selected="false">Somos 3 personas</button>
+        </div>
+
+        <!-- Qué incluye — mismo contenido en las 3 modalidades -->
+        <div class="includes-block">
+          <div class="includes-title">Qué incluye</div>
+          <ul class="includes-list">
+            <li><span class="mark">✓</span>8 semanas de sesiones en vivo con Erick y tu grupo</li>
+            <li><span class="mark">✓</span>Material audiovisual: un video formativo por módulo</li>
+            <li><span class="mark">✓</span>Ejercicios y retos prácticos cada semana</li>
+            <li><span class="mark">✓</span>Tu Mapa de Propósito, en 3 capas</li>
+            <li><span class="mark">✓</span>Tu Plan Personal de Disciplina</li>
+            <li><span class="mark">✓</span>Tu Manifiesto Personal de cierre</li>
+          </ul>
+        </div>
 
         <div class="price-block step-price-block">
-          <span class="price-old">$850</span>
-          <span class="price-new">$500</span>
-          <span class="price-tag">PREVENTA</span>
+          <span class="price-old" id="modalityPriceOld">$850</span>
+          <span class="price-new-wrap">
+            <span class="price-new" id="modalityPriceNew">$550</span>
+            <span class="price-per" id="modalityPricePer" hidden>/persona</span>
+          </span>
+          <span class="price-tag" id="modalityPriceTag">PREVENTA</span>
         </div>
 
         <div class="hero-ctas step-ctas">
-          <a href="https://wa.me/51997473509?text=Quiero%20reservar%20mi%20plaza%20en%20Evolution" class="btn-primary" target="_blank" rel="noopener">Reservar mi plaza →</a>
+          <button type="button" class="btn-primary" id="modalityBuyBtn">Reservar mi plaza →</button>
           <a href="https://wa.me/51997473509?text=Quiero%20agendar%20una%20sesi%C3%B3n%20de%20orientaci%C3%B3n%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Agendar orientación →</a>
         </div>
 
-        <p class="hero-plazas">Solo <strong>5 plazas</strong> a precio de preventa — hasta una semana antes del inicio.</p>
+        <p class="hero-plazas" id="modalityNote">Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.</p>
+
+        <!-- Checkout embebido de Hotmart — vacío/oculto hasta que se
+             hace clic en "Reservar", para no cargar 3 checkouts a la vez. -->
+        <div id="inline_checkout" class="hotmart-checkout-wrap" hidden></div>
       </div>
     </div>
 
@@ -751,19 +831,144 @@
   <div style="display:flex; justify-content:center;">
     <div class="price-block final-price-block">
       <span class="price-old">$850</span>
-      <span class="price-new">$500</span>
+      <span class="price-new">$550</span>
       <span class="price-tag">PREVENTA</span>
     </div>
   </div>
 
   <div class="hero-ctas">
-    <a href="https://wa.me/51997473509?text=Quiero%20reservar%20mi%20plaza%20en%20Evolution" class="btn-primary" target="_blank" rel="noopener">Reservar mi plaza →</a>
+    <a href="#paso-3" class="btn-primary">Reservar mi plaza →</a>
   </div>
 </section>
 
 <footer class="footer">
   Evolution: High Performance Training — Erick Castellano
 </footer>
+
+<script>
+  // ===== Paso 3: selector de modalidad + checkout embebido de Hotmart =====
+  // Cada modalidad es una oferta distinta en Hotmart — reemplazar estos 3
+  // códigos por los reales una vez creadas las ofertas en Hotmart.
+  //
+  // El script de Hotmart (hotmart-checkout-elements.js) se carga recién al
+  // primer clic en "Reservar", no de entrada — así nadie descarga ese
+  // script de terceros solo por visitar la página, y el checkout nunca
+  // aparece antes de que la persona elija comprar.
+  (function () {
+    let hotmartScriptPromise = null;
+    function loadHotmartScript() {
+      if (hotmartScriptPromise) return hotmartScriptPromise;
+      hotmartScriptPromise = new Promise(function (resolve, reject) {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.hotmart.com/lib/hotmart-checkout-elements.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+      return hotmartScriptPromise;
+    }
+
+    const MODALITIES = {
+      individual: {
+        priceOld: '$850',
+        priceNew: '$550',
+        priceTag: 'PREVENTA',
+        perPerson: false,
+        note: 'Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.',
+        buttonText: 'Reservar mi plaza →',
+        offer: 'OFERTA_INDIVIDUAL_PLACEHOLDER'
+      },
+      duo: {
+        priceOld: null,
+        priceNew: '$770',
+        priceTag: null,
+        perPerson: true,
+        note: 'Precio por persona, pagando juntos — 2 plazas.',
+        buttonText: 'Reservar nuestras 2 plazas →',
+        offer: 'OFERTA_DUO_PLACEHOLDER'
+      },
+      trio: {
+        priceOld: null,
+        priceNew: '$660',
+        priceTag: null,
+        perPerson: true,
+        note: 'Precio por persona, pagando juntos — 3 plazas.',
+        buttonText: 'Reservar nuestras 3 plazas →',
+        offer: 'OFERTA_TRIO_PLACEHOLDER'
+      }
+    };
+
+    const tabs = document.querySelectorAll('.modality-tab');
+    const priceOldEl = document.getElementById('modalityPriceOld');
+    const priceNewEl = document.getElementById('modalityPriceNew');
+    const pricePerEl = document.getElementById('modalityPricePer');
+    const priceTagEl = document.getElementById('modalityPriceTag');
+    const noteEl = document.getElementById('modalityNote');
+    const buyBtn = document.getElementById('modalityBuyBtn');
+    const checkoutWrap = document.getElementById('inline_checkout');
+
+    let currentModality = 'individual';
+
+    // Cambiar de modalidad siempre cierra un checkout que hubiera quedado
+    // abierto — nunca queda visible el checkout de una oferta que ya no
+    // es la elegida.
+    function closeCheckout() {
+      checkoutWrap.hidden = true;
+      checkoutWrap.innerHTML = '';
+    }
+
+    function render(modality) {
+      const data = MODALITIES[modality];
+      currentModality = modality;
+
+      tabs.forEach(function (tab) {
+        const active = tab.dataset.modality === modality;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+
+      priceOldEl.hidden = !data.priceOld;
+      if (data.priceOld) priceOldEl.textContent = data.priceOld;
+
+      priceNewEl.textContent = data.priceNew;
+      pricePerEl.hidden = !data.perPerson;
+
+      priceTagEl.hidden = !data.priceTag;
+      if (data.priceTag) priceTagEl.textContent = data.priceTag;
+
+      noteEl.innerHTML = data.note;
+      buyBtn.textContent = data.buttonText;
+
+      closeCheckout();
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { render(tab.dataset.modality); });
+    });
+
+    buyBtn.addEventListener('click', function () {
+      const data = MODALITIES[currentModality];
+      checkoutWrap.innerHTML = '<p class="checkout-loading">Cargando el pago seguro…</p>';
+      checkoutWrap.hidden = false;
+      checkoutWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      loadHotmartScript().then(function () {
+        checkoutWrap.innerHTML = '';
+        const elements = checkoutElements.init('inlineCheckout', { offer: data.offer });
+        elements.mount('#inline_checkout');
+      }).catch(function (e) {
+        // Con un código de oferta placeholder (todavía sin reemplazar por
+        // el real de Hotmart), o si el script de Hotmart no llega a
+        // cargar, esto puede fallar — no debe romper la página, solo
+        // avisa acá adentro en vez de dejarlo colgado en "Cargando…".
+        console.error('No se pudo montar el checkout de Hotmart:', e);
+        checkoutWrap.innerHTML = '<p class="checkout-loading">No se pudo cargar el pago. Intenta de nuevo o escríbenos por WhatsApp.</p>';
+      });
+    });
+
+    render('individual');
+  })();
+</script>
 
 </body>
 </html>
