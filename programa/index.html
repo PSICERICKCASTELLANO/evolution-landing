@@ -393,6 +393,12 @@
      al lado del otro — en móvil (ver @media 860px) uno debajo del otro,
      igual que estaba. */
   .paso3-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  /* Escritorio: "qué incluye + precio" a la izquierda, calendario a la
+     derecha — orden invertido respecto al HTML (que sigue trayendo el
+     calendario primero) solo para este ancho; en móvil se resetea abajo
+     para volver al orden natural del HTML (calendario arriba). */
+  .paso3-col-calendario { order: 2; }
+  .paso3-col-oferta { order: 1; }
 
   /* ===== Tu calendario de sesiones (Paso 3) ===== */
   .calendar-block {
@@ -565,6 +571,7 @@
     .framework-flow { grid-template-columns: 1fr; gap: 16px; }
     .framework-arrow { transform: rotate(90deg); padding: 4px 0; }
     .paso3-grid { grid-template-columns: 1fr; gap: 0; }
+    .paso3-col-calendario, .paso3-col-oferta { order: 0; }
   }
   @media (max-width: 560px) {
     .deliverables-grid { grid-template-columns: 1fr; }
@@ -662,22 +669,24 @@
         <div class="step-label">Paso 3</div>
         <h3 class="step-title">Da el siguiente paso</h3>
 
-        <!-- En escritorio, calendario y "qué incluye + precio" van uno al
-             lado del otro (.paso3-grid, 2 columnas); en móvil, uno debajo
-             del otro (ver @media 860px). -->
+        <!-- En escritorio, "qué incluye + precio" y calendario van uno al
+             lado del otro (.paso3-grid, 2 columnas; orden visual invertido
+             respecto al HTML vía CSS order, ver .paso3-col-calendario/
+             .paso3-col-oferta); en móvil, uno debajo del otro en el orden
+             natural del HTML — calendario arriba (ver @media 860px). -->
         <div class="paso3-grid">
 
-          <!-- Columna izquierda: Iniciamos el ... / calendario de sesiones
-               — "Estoy en" (país) va primero; abajo, un carrusel con
-               flechas recorre las 8 semanas (arranca en la 1) y arma en
-               vivo la fecha/hora real de esa sesión con
-               Intl.DateTimeFormat + timeZone (nunca una tabla de horarios
-               a mano, así el horario de verano de EEUU/Chile se ajusta
-               solo). La hora base es siempre 7:00 PM hora Perú
-               (America/Lima, sin horario de verano) — ver WEEKS y
-               formatSessionDateTime() en el script al final del
-               archivo. -->
-          <div class="paso3-col">
+          <!-- Primero en el HTML, a la derecha en escritorio (ver order
+               arriba): Iniciamos el ... / calendario de sesiones — "Estoy
+               en" (país) va primero; abajo, un carrusel con flechas
+               recorre las 8 semanas (arranca en la 1) y arma en vivo la
+               fecha/hora real de esa sesión con Intl.DateTimeFormat +
+               timeZone (nunca una tabla de horarios a mano, así el
+               horario de verano de EEUU/Chile se ajusta solo). La hora
+               base es siempre 8:30 PM hora Perú (America/Lima, sin
+               horario de verano) — ver WEEKS y formatSessionDateTime()
+               en el script al final del archivo. -->
+          <div class="paso3-col paso3-col-calendario">
             <div class="calendar-block">
               <div class="calendar-header">
                 <div class="calendar-icon">📅</div>
@@ -706,16 +715,17 @@
                 <div class="calendar-result">
                   <div class="calendar-result-progress" id="calendarResultProgress">Sesión 1 de 8</div>
                   <div class="calendar-result-week" id="calendarResultWeek">Semana 1 — Mentalidad de Evolución</div>
-                  <div class="calendar-result-time" id="calendarResultTime">🕖 Miércoles 23 de septiembre, 7:00 p.m. (hora Perú)</div>
+                  <div class="calendar-result-time" id="calendarResultTime">🕖 Miércoles 23 de septiembre, 8:30 p.m. (hora Perú)</div>
                 </div>
                 <button type="button" class="calendar-arrow" id="weekNext" aria-label="Siguiente sesión">›</button>
               </div>
             </div>
           </div>
 
-          <!-- Columna derecha: modalidad + qué incluye + precio + CTAs +
-               checkout de Hotmart. -->
-          <div class="paso3-col">
+          <!-- Segundo en el HTML, a la izquierda en escritorio (ver order
+               arriba): modalidad + qué incluye + precio + CTAs + checkout
+               de Hotmart. -->
+          <div class="paso3-col paso3-col-oferta">
             <!-- Selector de modalidad — cambia todo el bloque de abajo (qué
                  incluye queda fijo, precio/nota/botón/oferta de Hotmart
                  cambian). Ver script al final del archivo (objeto MODALITIES). -->
@@ -976,7 +986,7 @@
 
 <script>
   // ===== Paso 3: "Tu calendario de sesiones" =====
-  // Fecha calendario + 7:00 PM hora Perú (America/Lima, sin horario de
+  // Fecha calendario + 8:30 PM hora Perú (America/Lima, sin horario de
   // verano) son fijos por semana — lo único que cambia según el país
   // elegido es la hora mostrada, recalculada con Intl.DateTimeFormat +
   // timeZone (nunca una tabla de horarios a mano), así el horario de
@@ -998,12 +1008,12 @@
       return p ? p.value : '';
     }
 
-    // La fecha/hora base de cada semana es siempre 19:00 en America/Lima
-    // (UTC-5 todo el año, sin horario de verano) — sumar 5h a las 19:00 da
-    // directamente el instante UTC real, sin depender de ninguna tabla de
-    // huso horario a mano.
+    // La fecha/hora base de cada semana es siempre 20:30 (8:30 PM) en
+    // America/Lima (UTC-5 todo el año, sin horario de verano) — sumar 5h
+    // a las 20:30 da directamente el instante UTC real, sin depender de
+    // ninguna tabla de huso horario a mano.
     function sessionInstant(week) {
-      return new Date(Date.UTC(week.year, week.month - 1, week.day, 19 + 5, 0, 0));
+      return new Date(Date.UTC(week.year, week.month - 1, week.day, 20 + 5, 30, 0));
     }
 
     function formatSessionDateTime(week, timeZone) {
