@@ -726,6 +726,158 @@
     color: var(--steel);
   }
 
+  /* ============ PASO 3: INSCRIPCIÓN ============ */
+  /* Sección movida acá desde /programa#paso-3 (2026-09-10) — se queda
+     acá sola, sin Paso 1/2 antes, por eso usa el patrón eyebrow + h2 del
+     resto de esta página en vez del step-marker numerado de /programa. */
+  /* Más ancha que el resto de las secciones (section-narrow, 720px) — el
+     calendario y "qué incluye + precio" necesitan el espacio extra en 2
+     columnas en escritorio (ver .paso3-grid). */
+  .paso3-section { max-width: 1140px; }
+
+  /* En escritorio, "qué incluye + precio" y calendario van uno al lado
+     del otro (.paso3-grid, 2 columnas; orden visual invertido respecto
+     al HTML vía CSS order, ver .paso3-col-calendario/.paso3-col-oferta);
+     en móvil, uno debajo del otro en el orden natural del HTML —
+     calendario arriba (ver @media 860px). */
+  .paso3-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 40px; }
+  .paso3-col-calendario { order: 2; }
+  .paso3-col-oferta { order: 1; }
+
+  /* ===== Tu calendario de sesiones ===== */
+  .calendar-block {
+    margin-bottom: 28px; padding: 26px 26px 24px; border-radius: 18px; max-width: 480px;
+    border: 1px solid rgba(150,167,219,0.16);
+    background: linear-gradient(165deg, rgba(16,23,51,0.55), rgba(5,7,15,0.5));
+  }
+  .calendar-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; }
+  .calendar-icon {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 11px;
+    background: rgba(255,126,32,0.1); border: 1px solid rgba(255,126,32,0.28);
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .calendar-title { font-size: 16px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .calendar-subtitle {
+    font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 300; color: var(--steel); line-height: 1.5;
+  }
+
+  .calendar-field { margin-bottom: 20px; }
+  .calendar-field-tz { max-width: 260px; }
+  .calendar-field label {
+    display: block; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--steel-dim); margin-bottom: 8px;
+  }
+  .calendar-field select {
+    width: 100%; padding: 12px 34px 12px 14px; border-radius: 11px;
+    border: 1px solid rgba(150,167,219,0.22); background-color: rgba(5,7,15,0.6);
+    color: var(--cream); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2396A7DB' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    transition: border-color 0.2s ease;
+  }
+  .calendar-field select:focus { outline: none; border-color: var(--orange); }
+  .calendar-field select option { background: var(--navy-mid); color: var(--cream); }
+
+  .calendar-stepper { display: flex; align-items: center; gap: 12px; }
+  .calendar-arrow {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid rgba(150,167,219,0.24); background: rgba(150,167,219,0.06);
+    color: var(--cream); font-size: 19px; font-weight: 700; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  }
+  .calendar-arrow:hover:not(:disabled) { border-color: var(--orange); color: var(--orange-bright); }
+  .calendar-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .calendar-result {
+    flex: 1; min-width: 0; padding: 16px 18px; border-radius: 13px;
+    background: rgba(255,126,32,0.08); border: 1px solid rgba(255,126,32,0.28);
+  }
+  .calendar-result-progress {
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--steel-dim); margin-bottom: 8px;
+  }
+  .calendar-result-week {
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+    color: var(--orange-bright); margin-bottom: 6px;
+  }
+  .calendar-result-time { font-size: 15.5px; font-weight: 700; letter-spacing: -0.01em; color: var(--cream); }
+
+  /* ===== Selector de modalidad ===== */
+  .modality-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .modality-tab {
+    padding: 11px 20px; border-radius: 999px; border: 1px solid rgba(150,167,219,0.22);
+    background: rgba(150,167,219,0.05); color: var(--steel);
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .modality-tab:hover { border-color: var(--steel); color: var(--cream); }
+  .modality-tab.active {
+    background: linear-gradient(180deg, var(--orange-bright), var(--orange-dim));
+    border-color: transparent; color: #1A0E00;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 20px -6px rgba(255,126,32,0.5);
+  }
+
+  /* Qué incluye — fijo entre las 3 modalidades */
+  .includes-block {
+    margin-bottom: 24px; padding: 22px 24px; border-radius: 16px; max-width: 460px;
+    border: 1px solid rgba(150,167,219,0.14);
+    background: linear-gradient(165deg, rgba(16,23,51,0.5), rgba(5,7,15,0.45));
+  }
+  .includes-title {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--orange-bright); margin-bottom: 14px;
+  }
+  .includes-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .includes-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.5; color: var(--cream-dim); font-weight: 300;
+  }
+  .includes-list .mark {
+    flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; margin-top: 1px;
+    background: rgba(255,126,32,0.12); border: 1px solid var(--border-orange); color: var(--orange-bright);
+    display: flex; align-items: center; justify-content: center; font-size: 10px;
+  }
+
+  /* Price block */
+  .price-block {
+    display: inline-flex; align-items: center; gap: 18px;
+    padding: 18px 28px; border-radius: 18px;
+    border: 1px solid rgba(255,126,32,0.3);
+    background: linear-gradient(165deg, rgba(255,126,32,0.1), rgba(16,23,51,0.6));
+    margin-bottom: 24px;
+  }
+  .price-old {
+    font-family: 'Inter', sans-serif; font-size: 15px; color: var(--steel-dim);
+    text-decoration: line-through; text-decoration-color: rgba(150,167,219,0.5);
+  }
+  .price-new { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; color: var(--orange-bright); }
+  .price-new-wrap { display: inline-flex; align-items: baseline; gap: 5px; }
+  .price-per { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--steel-dim); }
+  .price-tag {
+    font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--cream); background: rgba(255,126,32,0.25); padding: 5px 10px; border-radius: 999px;
+  }
+
+  .hero-plazas {
+    font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--steel-dim); margin-top: 18px;
+  }
+  .hero-plazas strong { color: var(--orange-bright); }
+
+  .paso3-ctas { justify-content: flex-start; margin-bottom: 18px; }
+
+  /* Checkout embebido de Hotmart */
+  .hotmart-checkout-wrap {
+    margin-top: 8px; margin-bottom: 18px; border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(150,167,219,0.18); background: var(--navy-mid); min-height: 480px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hotmart-checkout-wrap[hidden] { display: none; }
+  .checkout-loading {
+    font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--steel); text-align: center; padding: 24px;
+  }
+
   /* ============ FINAL CTA ============ */
   .final-cta { text-align: center; padding: 40px 0 100px; }
   .final-cardio { max-width: 460px; margin: 0 auto 28px; height: 70px; }
@@ -764,6 +916,8 @@
     .erick-card { grid-template-columns: 1fr; text-align: center; padding: 36px 28px 0; gap: 0; }
     .erick-quote, .erick-desc { max-width: 100%; margin-left: auto; margin-right: auto; }
     .erick-photo-wrap { height: 280px; margin-top: 24px; }
+    .paso3-grid { grid-template-columns: 1fr; gap: 0; }
+    .paso3-col-calendario, .paso3-col-oferta { order: 0; }
   }
   @media (max-width: 560px) {
     .symptoms-grid { grid-template-columns: repeat(2, 1fr); }
@@ -773,6 +927,12 @@
     .ba-stats { grid-template-columns: 1fr; }
     .divider { margin: 64px 0; }
     .hero { padding: 56px 20px 40px; }
+    .price-block { flex-direction: column; align-items: flex-start; gap: 8px; padding: 18px 24px; }
+    .paso3-ctas { flex-direction: column; }
+    .paso3-ctas a, .paso3-ctas button { width: 100%; justify-content: center; }
+    .calendar-block { padding: 22px 20px 20px; }
+    .calendar-arrow { width: 34px; height: 34px; font-size: 16px; }
+    .calendar-stepper { gap: 8px; }
   }
 </style>
 </head>
@@ -912,6 +1072,118 @@
 
 <div class="section"><div class="divider"></div></div>
 
+<!-- ============ PASO 3: INSCRIPCIÓN ============ -->
+<!-- Movida acá desde /programa#paso-3 (2026-09-10) — esa página ahora
+     enlaza acá ("Reservar mi plaza" → /#paso-3) en vez de tener su
+     propio checkout. -->
+<section class="section paso3-section" id="paso-3">
+  <div class="eyebrow">Paso 3</div>
+  <h2>Da el siguiente paso</h2>
+
+  <!-- En escritorio, "qué incluye + precio" y calendario van uno al lado
+       del otro (.paso3-grid, 2 columnas; orden visual invertido respecto
+       al HTML vía CSS order, ver .paso3-col-calendario/.paso3-col-oferta);
+       en móvil, uno debajo del otro en el orden natural del HTML —
+       calendario arriba (ver @media 860px). -->
+  <div class="paso3-grid">
+
+    <!-- Primero en el HTML, a la derecha en escritorio (ver order arriba):
+         calendario de sesiones — "Estoy en" (país) va primero; abajo, un
+         carrusel con flechas recorre las 8 semanas (arranca en la 1) y
+         arma en vivo la fecha/hora real de esa sesión con
+         Intl.DateTimeFormat + timeZone (nunca una tabla de horarios a
+         mano, así el horario de verano de EEUU/Chile se ajusta solo). La
+         hora base es siempre 8:30 PM hora Perú (America/Lima, sin
+         horario de verano) — ver WEEKS y formatSessionDateTime() en el
+         script al final del archivo. -->
+    <div class="paso3-col paso3-col-calendario">
+      <div class="calendar-block">
+        <div class="calendar-header">
+          <div class="calendar-icon">📅</div>
+          <div>
+            <div class="calendar-title">Iniciamos el miércoles 23 de setiembre</div>
+            <div class="calendar-subtitle">8 semanas en vivo, todos los miércoles</div>
+          </div>
+        </div>
+
+        <div class="calendar-field calendar-field-tz">
+          <label for="tzSelect">Estoy en</label>
+          <select id="tzSelect">
+            <option value="America/Lima" selected>Perú</option>
+            <option value="America/Santiago">Chile</option>
+            <option value="America/Bogota">Colombia</option>
+            <option value="America/Guayaquil">Ecuador</option>
+            <option value="America/Argentina/Buenos_Aires">Argentina</option>
+            <option value="America/Mexico_City">México</option>
+            <option value="America/New_York">Estados Unidos - Este</option>
+            <option value="America/Los_Angeles">Estados Unidos - Oeste</option>
+          </select>
+        </div>
+
+        <div class="calendar-stepper">
+          <button type="button" class="calendar-arrow" id="weekPrev" aria-label="Sesión anterior">‹</button>
+          <div class="calendar-result">
+            <div class="calendar-result-progress" id="calendarResultProgress">Sesión 1 de 8</div>
+            <div class="calendar-result-week" id="calendarResultWeek">Semana 1 — Mentalidad de Evolución</div>
+            <div class="calendar-result-time" id="calendarResultTime">🕖 Miércoles 23 de septiembre, 8:30 p.m. (hora Perú)</div>
+          </div>
+          <button type="button" class="calendar-arrow" id="weekNext" aria-label="Siguiente sesión">›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segundo en el HTML, a la izquierda en escritorio (ver order
+         arriba): modalidad + qué incluye + precio + CTAs + checkout de
+         Hotmart. -->
+    <div class="paso3-col paso3-col-oferta">
+      <!-- Selector de modalidad — cambia todo el bloque de abajo (qué
+           incluye queda fijo, precio/nota/botón/oferta de Hotmart
+           cambian). Ver script al final del archivo (objeto MODALITIES). -->
+      <div class="modality-tabs" role="tablist" aria-label="Modalidad de inscripción">
+        <button type="button" class="modality-tab active" data-modality="individual" role="tab" aria-selected="true">Individual</button>
+        <button type="button" class="modality-tab" data-modality="duo" role="tab" aria-selected="false">Somos 2 personas</button>
+        <button type="button" class="modality-tab" data-modality="trio" role="tab" aria-selected="false">Somos 3 personas</button>
+      </div>
+
+      <!-- Qué incluye — mismo contenido en las 3 modalidades -->
+      <div class="includes-block">
+        <div class="includes-title">Qué incluye</div>
+        <ul class="includes-list">
+          <li><span class="mark">✓</span>8 semanas de sesiones en vivo con Erick y tu grupo</li>
+          <li><span class="mark">✓</span>Material audiovisual: un video formativo por módulo</li>
+          <li><span class="mark">✓</span>Ejercicios y retos prácticos cada semana</li>
+          <li><span class="mark">✓</span>Tu Mapa de Propósito, en 3 capas</li>
+          <li><span class="mark">✓</span>Tu Plan Personal de Disciplina</li>
+          <li><span class="mark">✓</span>Tu Manifiesto Personal de cierre</li>
+        </ul>
+      </div>
+
+      <div class="price-block">
+        <span class="price-old" id="modalityPriceOld">$850</span>
+        <span class="price-new-wrap">
+          <span class="price-new" id="modalityPriceNew">$550</span>
+          <span class="price-per" id="modalityPricePer" hidden>/persona</span>
+        </span>
+        <span class="price-tag" id="modalityPriceTag">PREVENTA</span>
+      </div>
+
+      <div class="hero-ctas paso3-ctas">
+        <button type="button" class="btn-primary" id="modalityBuyBtn">Reservar mi plaza →</button>
+        <a href="https://wa.me/51997473509?text=Quiero%20agendar%20una%20sesi%C3%B3n%20de%20orientaci%C3%B3n%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Agendar orientación →</a>
+      </div>
+
+      <p class="hero-plazas" id="modalityNote">Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.</p>
+
+      <!-- Checkout embebido de Hotmart — vacío/oculto hasta que se hace
+           clic en "Reservar", para no cargar 3 checkouts a la vez. -->
+      <div id="inline_checkout" class="hotmart-checkout-wrap" hidden></div>
+    </div>
+
+  </div>
+</section>
+
+<div class="section"><div class="divider"></div></div>
+
 <!-- ============ RECORRIDO 8 SEMANAS ============ -->
 <section class="section section-narrow">
   <div class="eyebrow">El programa</div>
@@ -959,7 +1231,7 @@
 <!-- ============ TESTIMONIOS ============ -->
 <section class="section">
   <div class="eyebrow">Testimonios</div>
-  <h2>Personas que ya estaban avanzando</h2>
+  <h2>Personas que ya están avanzando</h2>
 
   <div class="testimonials">
     <div class="testimonial-card">
@@ -1220,8 +1492,232 @@
       btnAfter.classList.toggle('active', state === 'after');
     }
 
-    btnBefore.addEventListener('click', function () { setState('before'); });
-    btnAfter.addEventListener('click', function () { setState('after'); });
+    btnBefore.addEventListener('click', function () { setState('before'); resetAutoRotate(); });
+    btnAfter.addEventListener('click', function () { setState('after'); resetAutoRotate(); });
+
+    // Cambia de estado solo cada 10s — un clic manual reinicia la cuenta
+    // para no pisar al usuario justo después de que elija uno a propósito.
+    let autoRotateTimer = null;
+    function autoRotateTick() {
+      setState(content.classList.contains('state-after') ? 'before' : 'after');
+    }
+    function resetAutoRotate() {
+      if (autoRotateTimer) clearInterval(autoRotateTimer);
+      autoRotateTimer = setInterval(autoRotateTick, 10000);
+    }
+    resetAutoRotate();
+  })();
+</script>
+
+<script>
+  // ===== Paso 3: "Tu calendario de sesiones" =====
+  // Fecha calendario + 8:30 PM hora Perú (America/Lima, sin horario de
+  // verano) son fijos por semana — lo único que cambia según el país
+  // elegido es la hora mostrada, recalculada con Intl.DateTimeFormat +
+  // timeZone (nunca una tabla de horarios a mano), así el horario de
+  // verano de España/EEUU se ajusta solo en cada consulta.
+  (function () {
+    const WEEKS = [
+      { label: 'Semana 1', topic: 'Mentalidad de Evolución', year: 2026, month: 9, day: 23 },
+      { label: 'Semana 2', topic: 'Autoestima Evolutiva', year: 2026, month: 9, day: 30 },
+      { label: 'Semana 3', topic: 'Ansiedad y Control', year: 2026, month: 10, day: 7 },
+      { label: 'Semana 4', topic: 'Propósito y Ambición Saludable', year: 2026, month: 10, day: 14 },
+      { label: 'Semana 5', topic: 'Relaciones y Asertividad', year: 2026, month: 10, day: 21 },
+      { label: 'Semana 6', topic: 'Disciplina y Resiliencia', year: 2026, month: 10, day: 28 },
+      { label: 'Semana 7', topic: 'Vínculos y Conexión', year: 2026, month: 11, day: 4 },
+      { label: 'Semana 8', topic: 'Integración', year: 2026, month: 11, day: 11 }
+    ];
+
+    function getPart(parts, type) {
+      const p = parts.find(function (p) { return p.type === type; });
+      return p ? p.value : '';
+    }
+
+    // La fecha/hora base de cada semana es siempre 20:30 (8:30 PM) en
+    // America/Lima (UTC-5 todo el año, sin horario de verano) — sumar 5h
+    // a las 20:30 da directamente el instante UTC real, sin depender de
+    // ninguna tabla de huso horario a mano.
+    function sessionInstant(week) {
+      return new Date(Date.UTC(week.year, week.month - 1, week.day, 20 + 5, 30, 0));
+    }
+
+    function formatSessionDateTime(week, timeZone) {
+      const instant = sessionInstant(week);
+
+      const dateParts = new Intl.DateTimeFormat('es', {
+        timeZone: timeZone, weekday: 'long', day: 'numeric', month: 'long'
+      }).formatToParts(instant);
+      const timeParts = new Intl.DateTimeFormat('en-US', {
+        timeZone: timeZone, hour: 'numeric', minute: '2-digit', hourCycle: 'h23'
+      }).formatToParts(instant);
+
+      const weekday = getPart(dateParts, 'weekday');
+      const weekdayCap = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+      const day = getPart(dateParts, 'day');
+      const month = getPart(dateParts, 'month');
+      const hour24 = parseInt(getPart(timeParts, 'hour'), 10);
+      const minute = getPart(timeParts, 'minute');
+      const ampm = hour24 < 12 ? 'a.m.' : 'p.m.';
+      const hour12 = ((hour24 + 11) % 12) + 1;
+
+      return weekdayCap + ' ' + day + ' de ' + month + ', ' + hour12 + ':' + minute + ' ' + ampm;
+    }
+
+    const tzSelect = document.getElementById('tzSelect');
+    const prevBtn = document.getElementById('weekPrev');
+    const nextBtn = document.getElementById('weekNext');
+    const progressEl = document.getElementById('calendarResultProgress');
+    const resultWeekEl = document.getElementById('calendarResultWeek');
+    const resultTimeEl = document.getElementById('calendarResultTime');
+
+    let currentWeek = 0; // arranca en la Sesión 1
+
+    function renderCalendarResult() {
+      const week = WEEKS[currentWeek];
+      const timeZone = tzSelect.value;
+      const countryLabel = tzSelect.options[tzSelect.selectedIndex].text;
+
+      progressEl.textContent = 'Sesión ' + (currentWeek + 1) + ' de ' + WEEKS.length;
+      resultWeekEl.textContent = week.label + ' — ' + week.topic;
+      resultTimeEl.textContent = '🕖 ' + formatSessionDateTime(week, timeZone) + ' (hora ' + countryLabel + ')';
+
+      prevBtn.disabled = currentWeek === 0;
+      nextBtn.disabled = currentWeek === WEEKS.length - 1;
+    }
+
+    prevBtn.addEventListener('click', function () {
+      if (currentWeek > 0) { currentWeek--; renderCalendarResult(); }
+    });
+    nextBtn.addEventListener('click', function () {
+      if (currentWeek < WEEKS.length - 1) { currentWeek++; renderCalendarResult(); }
+    });
+    tzSelect.addEventListener('change', renderCalendarResult);
+    renderCalendarResult();
+  })();
+</script>
+
+<script>
+  // ===== Paso 3: selector de modalidad + checkout embebido de Hotmart =====
+  // Cada modalidad es una oferta distinta en Hotmart — reemplazar estos 3
+  // códigos por los reales una vez creadas las ofertas en Hotmart.
+  //
+  // El script de Hotmart (hotmart-checkout-elements.js) se carga recién al
+  // primer clic en "Reservar", no de entrada — así nadie descarga ese
+  // script de terceros solo por visitar la página, y el checkout nunca
+  // aparece antes de que la persona elija comprar.
+  (function () {
+    let hotmartScriptPromise = null;
+    function loadHotmartScript() {
+      if (hotmartScriptPromise) return hotmartScriptPromise;
+      hotmartScriptPromise = new Promise(function (resolve, reject) {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.hotmart.com/lib/hotmart-checkout-elements.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+      return hotmartScriptPromise;
+    }
+
+    const MODALITIES = {
+      individual: {
+        priceOld: '$850',
+        priceNew: '$550',
+        priceTag: 'PREVENTA',
+        perPerson: false,
+        note: 'Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.',
+        buttonText: 'Reservar mi plaza →',
+        offer: 'OFERTA_INDIVIDUAL_PLACEHOLDER'
+      },
+      duo: {
+        priceOld: null,
+        priceNew: '$770',
+        priceTag: null,
+        perPerson: true,
+        note: 'Precio por persona, pagando juntos — 2 plazas.',
+        buttonText: 'Reservar nuestras 2 plazas →',
+        offer: 'OFERTA_DUO_PLACEHOLDER'
+      },
+      trio: {
+        priceOld: null,
+        priceNew: '$660',
+        priceTag: null,
+        perPerson: true,
+        note: 'Precio por persona, pagando juntos — 3 plazas.',
+        buttonText: 'Reservar nuestras 3 plazas →',
+        offer: 'OFERTA_TRIO_PLACEHOLDER'
+      }
+    };
+
+    const tabs = document.querySelectorAll('.modality-tab');
+    const priceOldEl = document.getElementById('modalityPriceOld');
+    const priceNewEl = document.getElementById('modalityPriceNew');
+    const pricePerEl = document.getElementById('modalityPricePer');
+    const priceTagEl = document.getElementById('modalityPriceTag');
+    const noteEl = document.getElementById('modalityNote');
+    const buyBtn = document.getElementById('modalityBuyBtn');
+    const checkoutWrap = document.getElementById('inline_checkout');
+
+    let currentModality = 'individual';
+
+    // Cambiar de modalidad siempre cierra un checkout que hubiera quedado
+    // abierto — nunca queda visible el checkout de una oferta que ya no
+    // es la elegida.
+    function closeCheckout() {
+      checkoutWrap.hidden = true;
+      checkoutWrap.innerHTML = '';
+    }
+
+    function render(modality) {
+      const data = MODALITIES[modality];
+      currentModality = modality;
+
+      tabs.forEach(function (tab) {
+        const active = tab.dataset.modality === modality;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+
+      priceOldEl.hidden = !data.priceOld;
+      if (data.priceOld) priceOldEl.textContent = data.priceOld;
+
+      priceNewEl.textContent = data.priceNew;
+      pricePerEl.hidden = !data.perPerson;
+
+      priceTagEl.hidden = !data.priceTag;
+      if (data.priceTag) priceTagEl.textContent = data.priceTag;
+
+      noteEl.innerHTML = data.note;
+      buyBtn.textContent = data.buttonText;
+
+      closeCheckout();
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { render(tab.dataset.modality); });
+    });
+
+    buyBtn.addEventListener('click', function () {
+      const data = MODALITIES[currentModality];
+      checkoutWrap.innerHTML = '<p class="checkout-loading">Cargando el pago seguro…</p>';
+      checkoutWrap.hidden = false;
+      checkoutWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      loadHotmartScript().then(function () {
+        checkoutWrap.innerHTML = '';
+        const elements = checkoutElements.init('inlineCheckout', { offer: data.offer });
+        elements.mount('#inline_checkout');
+      }).catch(function (e) {
+        // Con un código de oferta placeholder (todavía sin reemplazar por
+        // el real de Hotmart), o si el script de Hotmart no llega a
+        // cargar, esto puede fallar — no debe romper la página, solo
+        // avisa acá adentro en vez de dejarlo colgado en "Cargando…".
+        console.error('No se pudo montar el checkout de Hotmart:', e);
+        checkoutWrap.innerHTML = '<p class="checkout-loading">No se pudo cargar el pago. Intenta de nuevo o escríbenos por WhatsApp.</p>';
+      });
+    });
+
+    render('individual');
   })();
 </script>
 
