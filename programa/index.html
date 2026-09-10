@@ -511,6 +511,20 @@
     font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--steel); text-align: center; padding: 24px;
   }
 
+  /* Elegir forma de pago (transferencia con asesor / tarjeta en línea) —
+     primer paso al hacer clic en "Reservar", adentro del mismo contenedor
+     que después muestra el checkout de Hotmart. */
+  .payment-choice { display: flex; flex-direction: column; gap: 12px; padding: 24px; width: 100%; }
+  .payment-choice-option {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+    padding: 16px 20px; border-radius: 14px; border: 1px solid rgba(150,167,219,0.22);
+    background: rgba(150,167,219,0.05); cursor: pointer; text-align: left;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .payment-choice-option:hover { border-color: var(--orange); background: rgba(255,126,32,0.08); transform: translateY(-1px); }
+  .payment-choice-title { font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 700; color: var(--cream); }
+  .payment-choice-desc { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 300; color: var(--steel); }
+
   /* Grid de videos-placeholder del Paso 2 */
   .faq-video-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
@@ -605,6 +619,10 @@
     <div class="hero-video-inner">
       <iframe src="https://www.loom.com/embed/9f55dc76fc544688b0bdf193d21b74be?hideEmbedTopBar=true" frameborder="0" allowfullscreen></iframe>
     </div>
+  </div>
+
+  <div style="display:flex; justify-content:center;">
+    <a href="#paso-3" class="btn-primary">Reservar mi plaza →</a>
   </div>
 </section>
 
@@ -1102,7 +1120,8 @@
         perPerson: false,
         note: 'Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.',
         buttonText: 'Reservar mi plaza →',
-        offer: 'OFERTA_INDIVIDUAL_PLACEHOLDER'
+        offer: 'OFERTA_INDIVIDUAL_PLACEHOLDER',
+        label: 'Individual'
       },
       duo: {
         priceOld: null,
@@ -1111,7 +1130,8 @@
         perPerson: true,
         note: 'Precio por persona, pagando juntos — 2 plazas.',
         buttonText: 'Reservar nuestras 2 plazas →',
-        offer: 'OFERTA_DUO_PLACEHOLDER'
+        offer: 'OFERTA_DUO_PLACEHOLDER',
+        label: 'Dúo (2 personas)'
       },
       trio: {
         priceOld: null,
@@ -1120,7 +1140,8 @@
         perPerson: true,
         note: 'Precio por persona, pagando juntos — 3 plazas.',
         buttonText: 'Reservar nuestras 3 plazas →',
-        offer: 'OFERTA_TRIO_PLACEHOLDER'
+        offer: 'OFERTA_TRIO_PLACEHOLDER',
+        label: 'Trío (3 personas)'
       }
     };
 
@@ -1172,11 +1193,39 @@
       tab.addEventListener('click', function () { render(tab.dataset.modality); });
     });
 
-    buyBtn.addEventListener('click', function () {
+    // Al hacer clic en "Reservar" no se abre el checkout directo — primero
+    // se elige la forma de pago (transferencia con asesor, o tarjeta en
+    // línea vía Hotmart). Las dos opciones se renderizan adentro del mismo
+    // contenedor que antes mostraba el checkout ("inline_checkout").
+    function renderPaymentChoice() {
+      checkoutWrap.innerHTML =
+        '<div class="payment-choice">' +
+          '<button type="button" class="payment-choice-option" id="payTransferBtn">' +
+            '<span class="payment-choice-title">Pagar vía transferencia</span>' +
+            '<span class="payment-choice-desc">Te contactaremos con un asesor</span>' +
+          '</button>' +
+          '<button type="button" class="payment-choice-option" id="payCardBtn">' +
+            '<span class="payment-choice-title">Pagar con tarjeta</span>' +
+            '<span class="payment-choice-desc">Pago en línea</span>' +
+          '</button>' +
+        '</div>';
+      document.getElementById('payTransferBtn').addEventListener('click', startTransferPayment);
+      document.getElementById('payCardBtn').addEventListener('click', startCardCheckout);
+    }
+
+    // Transferencia: no hay checkout propio — abre WhatsApp con el mensaje
+    // ya armado (modalidad incluida) para que un asesor siga la conversación.
+    function startTransferPayment() {
+      const data = MODALITIES[currentModality];
+      const message = 'Hola, quiero reservar mi plaza para Evolution (modalidad: ' + data.label + ') y pagar vía transferencia.';
+      window.open('https://wa.me/51997473509?text=' + encodeURIComponent(message), '_blank', 'noopener');
+      checkoutWrap.innerHTML = '<p class="checkout-loading">Te escribimos por WhatsApp para coordinar el pago por transferencia.</p>';
+    }
+
+    // Tarjeta: mismo flujo de checkout embebido de Hotmart que había antes.
+    function startCardCheckout() {
       const data = MODALITIES[currentModality];
       checkoutWrap.innerHTML = '<p class="checkout-loading">Cargando el pago seguro…</p>';
-      checkoutWrap.hidden = false;
-      checkoutWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       loadHotmartScript().then(function () {
         checkoutWrap.innerHTML = '';
@@ -1190,6 +1239,12 @@
         console.error('No se pudo montar el checkout de Hotmart:', e);
         checkoutWrap.innerHTML = '<p class="checkout-loading">No se pudo cargar el pago. Intenta de nuevo o escríbenos por WhatsApp.</p>';
       });
+    }
+
+    buyBtn.addEventListener('click', function () {
+      checkoutWrap.hidden = false;
+      renderPaymentChoice();
+      checkoutWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
     render('individual');
