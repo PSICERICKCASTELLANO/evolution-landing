@@ -2047,12 +2047,18 @@
         videoId: config.videoId,
         playerVars: {
           autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: config.videoId,
-          playsinline: 1, rel: 0, modestbranding: 1
+          playsinline: 1, rel: 0, modestbranding: 1, cc_load_policy: 0
         },
         events: {
           onReady: function (e) {
             e.target.mute();
             e.target.playVideo();
+            // cc_load_policy:0 ya evita que arranquen prendidos, pero
+            // youtube a veces los reactiva solo (video con subtítulos
+            // forzados) — esto los apaga de una por las dudas.
+            if (typeof e.target.unloadModule === 'function') {
+              e.target.unloadModule('captions');
+            }
           },
           onStateChange: function (e) {
             wrap.classList.toggle('is-paused', started && e.data === YT.PlayerState.PAUSED);
