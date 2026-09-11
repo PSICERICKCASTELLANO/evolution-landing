@@ -1371,12 +1371,17 @@
           onReady: function (e) {
             e.target.mute();
             e.target.playVideo();
-            // cc_load_policy:0 ya evita que arranquen prendidos, pero
-            // youtube a veces los reactiva solo (video con subtítulos
-            // forzados) — esto los apaga de una por las dudas.
-            if (typeof e.target.unloadModule === 'function') {
-              e.target.unloadModule('captions');
-            }
+          },
+          // cc_load_policy no tiene un valor documentado que los apague
+          // siempre — sin el parámetro, YouTube decide según la
+          // preferencia guardada en la cuenta/navegador de quien mira,
+          // que le puede ganar a lo que pongamos acá. La forma que
+          // realmente los apaga pase lo que pase es unloadModule(),
+          // pero recién sirve cuando ese módulo ya está cargado — por
+          // eso va en onApiChange (el aviso de que un módulo nuevo está
+          // disponible) y no en onReady, que dispara antes de tiempo.
+          onApiChange: function (e) {
+            e.target.unloadModule('captions');
           },
           onStateChange: function (e) {
             wrap.classList.toggle('is-paused', started && e.data === YT.PlayerState.PAUSED);
