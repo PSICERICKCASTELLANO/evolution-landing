@@ -196,6 +196,33 @@
     border: none;
   }
 
+  /* ============ REPRODUCTOR DE YOUTUBE PERSONALIZADO ============ */
+  /* Autoplay mudo al cargar → el primer clic reinicia el video desde el
+     principio con sonido → los clics siguientes pausan/reproducen. Un
+     solo script al final del archivo controla todas las instancias de
+     esta página, cada una con su propio contenedor (data-yt-target /
+     id) para que no colisionen entre sí. */
+  .yt-player-wrap { position: absolute; inset: 0; background: var(--navy-mid); }
+  .yt-player-wrap iframe { position: absolute; inset: 0; width: 100% !important; height: 100% !important; border: none; }
+  .yt-click-catcher { position: absolute; inset: 0; z-index: 2; cursor: pointer; }
+  .yt-mute-badge {
+    position: absolute; left: 14px; bottom: 14px; z-index: 3;
+    display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px;
+    background: rgba(5,7,15,0.75); border: 1px solid rgba(255,255,255,0.14);
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--cream);
+    pointer-events: none; transition: opacity 0.2s ease;
+  }
+  .yt-player-wrap.is-started .yt-mute-badge { opacity: 0; }
+  .yt-pause-icon {
+    position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s ease;
+  }
+  .yt-player-wrap.is-paused .yt-pause-icon { opacity: 1; }
+  .yt-pause-icon span {
+    width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: rgba(5,7,15,0.55); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-size: 22px; padding-left: 4px;
+  }
+
   .hero-ctas {
     display: flex;
     gap: 14px;
@@ -1009,7 +1036,12 @@
 
   <div class="hero-video">
     <div class="hero-video-inner">
-      <iframe src="https://www.loom.com/embed/aeabc36e9bdc40178ba6484406eac559?sid=0" frameborder="0" allowfullscreen></iframe>
+      <div class="yt-player-wrap" data-yt-target="ytPlayer_hero">
+        <div id="ytPlayer_hero"></div>
+        <div class="yt-click-catcher"></div>
+        <div class="yt-mute-badge">🔇 Toca para activar el sonido</div>
+        <div class="yt-pause-icon"><span>▶</span></div>
+      </div>
     </div>
   </div>
 
@@ -1294,7 +1326,12 @@
     </div>
     <div class="modulos-col-video">
       <div class="hero-video-inner">
-        <iframe src="https://www.loom.com/embed/9f55dc76fc544688b0bdf193d21b74be?hideEmbedTopBar=true" frameborder="0" allowfullscreen></iframe>
+        <div class="yt-player-wrap" data-yt-target="ytPlayer_paso1">
+          <div id="ytPlayer_paso1"></div>
+          <div class="yt-click-catcher"></div>
+          <div class="yt-mute-badge">🔇 Toca para activar el sonido</div>
+          <div class="yt-pause-icon"><span>▶</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1447,31 +1484,56 @@
   <div class="faq-video-grid">
     <div class="faq-video-card">
       <div class="faq-video-thumb">
-        <iframe src="https://www.loom.com/embed/e1759f3656a94610b711fe4010cdeeb0?hideEmbedTopBar=true" frameborder="0" allowfullscreen></iframe>
+        <div class="yt-player-wrap" data-yt-target="ytPlayer_obj1">
+          <div id="ytPlayer_obj1"></div>
+          <div class="yt-click-catcher"></div>
+          <div class="yt-mute-badge">🔇</div>
+          <div class="yt-pause-icon"><span>▶</span></div>
+        </div>
       </div>
       <div class="faq-video-title">¿Cómo funciona el programa?</div>
     </div>
     <div class="faq-video-card">
       <div class="faq-video-thumb">
-        <iframe src="https://www.loom.com/embed/18292504d53d414e88f9f54de092d0c6?hideEmbedTopBar=true" frameborder="0" allowfullscreen></iframe>
+        <div class="yt-player-wrap" data-yt-target="ytPlayer_obj2">
+          <div id="ytPlayer_obj2"></div>
+          <div class="yt-click-catcher"></div>
+          <div class="yt-mute-badge">🔇</div>
+          <div class="yt-pause-icon"><span>▶</span></div>
+        </div>
       </div>
       <div class="faq-video-title">¿Esto es terapia?</div>
     </div>
     <div class="faq-video-card">
       <div class="faq-video-thumb">
-        <iframe src="https://www.loom.com/embed/e9e43b9a1a2d42e9afa87c53c6fa7ead?hideEmbedTopBar=true" frameborder="0" allowfullscreen></iframe>
+        <div class="yt-player-wrap" data-yt-target="ytPlayer_obj3">
+          <div id="ytPlayer_obj3"></div>
+          <div class="yt-click-catcher"></div>
+          <div class="yt-mute-badge">🔇</div>
+          <div class="yt-pause-icon"><span>▶</span></div>
+        </div>
       </div>
       <div class="faq-video-title">No sé si es el momento adecuado para mí</div>
     </div>
     <div class="faq-video-card">
       <div class="faq-video-thumb">
-        <iframe src="https://www.loom.com/embed/89217a3c1e614cb78585ee77a3434b5f?hideEmbedTopBar=true" frameborder="0" allowfullscreen></iframe>
+        <div class="yt-player-wrap" data-yt-target="ytPlayer_obj4">
+          <div id="ytPlayer_obj4"></div>
+          <div class="yt-click-catcher"></div>
+          <div class="yt-mute-badge">🔇</div>
+          <div class="yt-pause-icon"><span>▶</span></div>
+        </div>
       </div>
       <div class="faq-video-title">Sobre la inversión</div>
     </div>
     <div class="faq-video-card">
       <div class="faq-video-thumb">
-        <iframe src="https://www.loom.com/embed/ca2733d59d174d00bec11e65f7ab3c10?hideEmbedTopBar=true" frameborder="0" allowfullscreen></iframe>
+        <div class="yt-player-wrap" data-yt-target="ytPlayer_obj5">
+          <div id="ytPlayer_obj5"></div>
+          <div class="yt-click-catcher"></div>
+          <div class="yt-mute-badge">🔇</div>
+          <div class="yt-pause-icon"><span>▶</span></div>
+        </div>
       </div>
       <div class="faq-video-title">Ya he tomado cursos antes</div>
     </div>
@@ -1937,6 +1999,89 @@
     });
 
     render('individual');
+  })();
+</script>
+
+<script>
+  // ===== Reproductor de YouTube personalizado =====
+  // Autoplay mudo al cargar el video → el primer clic lo reinicia desde
+  // el principio con sonido → los clics siguientes pausan/reproducen.
+  // Todas las instancias de esta página comparten este mismo script,
+  // cada una con su propio contenedor único (id + data-yt-target) para
+  // que no colisionen entre sí.
+  (function () {
+    const PLAYERS = [
+      { target: 'ytPlayer_hero', videoId: 'NvRF-YXbIdo' },
+      { target: 'ytPlayer_paso1', videoId: 'PWSiczIyqS4' },
+      { target: 'ytPlayer_obj1', videoId: 's1MbK8lt1kk' },
+      { target: 'ytPlayer_obj2', videoId: 'qrS3J5FtRfk' },
+      { target: 'ytPlayer_obj3', videoId: 'DSA95adQCTY' },
+      { target: 'ytPlayer_obj4', videoId: 'NaEfxC-6SYw' },
+      { target: 'ytPlayer_obj5', videoId: 'jLw6f-SkPu4' }
+    ];
+
+    let apiReadyPromise = null;
+    function loadYouTubeApi() {
+      if (apiReadyPromise) return apiReadyPromise;
+      apiReadyPromise = new Promise(function (resolve) {
+        if (window.YT && window.YT.Player) { resolve(); return; }
+        const previous = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function () {
+          if (typeof previous === 'function') previous();
+          resolve();
+        };
+        const script = document.createElement('script');
+        script.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(script);
+      });
+      return apiReadyPromise;
+    }
+
+    function initPlayer(config) {
+      const wrap = document.querySelector('.yt-player-wrap[data-yt-target="' + config.target + '"]');
+      if (!wrap) return;
+      const catcher = wrap.querySelector('.yt-click-catcher');
+      let started = false;
+
+      const player = new YT.Player(config.target, {
+        videoId: config.videoId,
+        playerVars: {
+          autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: config.videoId,
+          playsinline: 1, rel: 0, modestbranding: 1
+        },
+        events: {
+          onReady: function (e) {
+            e.target.mute();
+            e.target.playVideo();
+          },
+          onStateChange: function (e) {
+            wrap.classList.toggle('is-paused', started && e.data === YT.PlayerState.PAUSED);
+          }
+        }
+      });
+
+      // Primer clic: reinicia desde el principio con sonido (deja de ser
+      // el "preview" mudo). Clics siguientes: pausan/reproducen nomás.
+      catcher.addEventListener('click', function () {
+        if (!started) {
+          started = true;
+          wrap.classList.add('is-started');
+          player.unMute();
+          player.seekTo(0);
+          player.playVideo();
+          return;
+        }
+        if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+          player.pauseVideo();
+        } else {
+          player.playVideo();
+        }
+      });
+    }
+
+    loadYouTubeApi().then(function () {
+      PLAYERS.forEach(initPlayer);
+    });
   })();
 </script>
 
