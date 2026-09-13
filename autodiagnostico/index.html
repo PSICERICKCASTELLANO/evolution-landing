@@ -227,6 +227,41 @@
   }
   .q-back:hover { color: var(--steel); }
 
+  /* ===== FORMULARIO (nombre/WhatsApp al inicio, profesión antes del
+     resultado) ===== */
+  .lead-form { display: flex; flex-direction: column; }
+  .lead-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--steel);
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+  .lead-label:first-child { margin-top: 0; }
+  .lead-input {
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(150,167,219,0.2);
+    background: rgba(0,0,0,0.25);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .lead-input:focus { border-color: var(--border-orange); background: rgba(0,0,0,0.35); }
+  .lead-input::placeholder { color: var(--steel-dim); }
+  .lead-error {
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: #FF6B5B;
+    margin-top: 10px;
+  }
+  .lead-error[hidden] { display: none; }
+  .lead-submit { margin-top: 28px; }
+
   /* ===== RESULTADO ===== */
   .result-badge {
     display: inline-flex;
@@ -352,8 +387,33 @@
     <button class="option-btn" id="startBtn" style="justify-content:center; font-weight:700; border-color:rgba(255,126,32,0.4);">Comenzar autodiagnóstico →</button>
   </div>
 
+  <!-- ===== PANTALLA: DATOS (nombre + WhatsApp, antes de arrancar) ===== -->
+  <div class="screen" data-screen="lead">
+    <div class="q-number">Antes de empezar</div>
+    <div class="q-text">Cuéntanos sobre ti</div>
+    <div class="lead-form">
+      <label class="lead-label" for="leadName">Tu nombre</label>
+      <input class="lead-input" type="text" id="leadName" placeholder="Nombre completo" autocomplete="name">
+      <label class="lead-label" for="leadWhatsapp">Tu WhatsApp</label>
+      <input class="lead-input" type="tel" id="leadWhatsapp" placeholder="Ej: +51 999 999 999" autocomplete="tel">
+      <p class="lead-error" id="leadError" hidden>Completa los dos campos para continuar.</p>
+      <button class="option-btn lead-submit" id="leadContinueBtn" style="justify-content:center; font-weight:700; border-color:rgba(255,126,32,0.4);">Continuar →</button>
+    </div>
+  </div>
+
   <!-- ===== PANTALLAS DE PREGUNTAS (generadas por JS) ===== -->
   <div id="questionsContainer"></div>
+
+  <!-- ===== PANTALLA: PROFESIÓN (última pregunta, antes del resultado) ===== -->
+  <div class="screen" data-screen="profession">
+    <div class="q-number">Última pregunta</div>
+    <div class="q-text">¿A qué te dedicas actualmente?</div>
+    <div class="lead-form">
+      <input class="lead-input" type="text" id="leadProfession" placeholder="Ej: Psicólogo, Coach, Emprendedor...">
+      <p class="lead-error" id="professionError" hidden>Contanos a qué te dedicas para ver tu resultado.</p>
+      <button class="option-btn lead-submit" id="professionContinueBtn" style="justify-content:center; font-weight:700; border-color:rgba(255,126,32,0.4);">Ver mi resultado →</button>
+    </div>
+  </div>
 
   <!-- ===== PANTALLA: RESULTADO ===== -->
   <div class="screen" data-screen="result">
@@ -367,9 +427,8 @@
       <div class="result-panel-text" id="resultProgram"></div>
     </div>
 
-    <a href="#" class="result-cta" id="resultCta" target="_blank" rel="noopener">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.11c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.26-4.34c0-4.54 3.7-8.24 8.25-8.24 4.54 0 8.24 3.7 8.24 8.24 0 4.55-3.7 8.2-8.24 8.2zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.4-.12-.56.13-.17.25-.64.81-.78.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.15.16-.25.24-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43-.14-.01-.31-.01-.48-.01-.17 0-.44.06-.67.31-.23.25-.87.85-.87 2.08 0 1.22.89 2.4 1.01 2.57.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.17-.48-.29z"/></svg>
-      Quiero trabajar en esto
+    <a href="/programa" class="result-cta" id="resultCta">
+      Quiero trabajar en esto →
     </a>
     <button class="result-retry" id="retryBtn">Volver a hacer el test</button>
   </div>
@@ -378,7 +437,16 @@
 
 <script>
 (function() {
-  const WHATSAPP_NUMBER = '51997473509';
+  // URL del Web App de Google Apps Script (Extensiones > Apps Script en la
+  // hoja de cálculo, desplegado como "Aplicación web", acceso "Cualquiera").
+  // Hasta no reemplazar esto por la URL real, el envío se salta solo (con
+  // un aviso en consola) — nunca bloquea que la persona vea su resultado.
+  const SHEETS_WEBHOOK_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+  // Datos que la persona deja antes de arrancar (nombre/WhatsApp) y justo
+  // antes del resultado (profesión) — se registran juntos en la hoja recién
+  // al final, cuando ya se calculó el resultado (ver submitLead()).
+  const leadData = { name: '', whatsapp: '', profession: '' };
 
   // ===== Preguntas: cada opción suma a un arquetipo (P, A, D, S) =====
   const questions = [
@@ -581,11 +649,50 @@
     }
   }
 
-  // Botón de inicio
+  // Botón de inicio — si ya tenemos nombre/WhatsApp (volviendo a hacer el
+  // test), no hace falta pedirlos de nuevo.
   document.getElementById('startBtn').addEventListener('click', function() {
+    if (leadData.name && leadData.whatsapp) {
+      currentIndex = 0;
+      updateProgress(0);
+      goToScreen('question-0');
+    } else {
+      goToScreen('lead');
+    }
+  });
+
+  // Pantalla de datos (nombre + WhatsApp) — obligatorios para arrancar.
+  document.getElementById('leadContinueBtn').addEventListener('click', function() {
+    const name = document.getElementById('leadName').value.trim();
+    const whatsapp = document.getElementById('leadWhatsapp').value.trim();
+    const errorEl = document.getElementById('leadError');
+
+    if (!name || !whatsapp) {
+      errorEl.hidden = false;
+      return;
+    }
+    errorEl.hidden = true;
+    leadData.name = name;
+    leadData.whatsapp = whatsapp;
+
     currentIndex = 0;
     updateProgress(0);
     goToScreen('question-0');
+  });
+
+  // Pantalla de profesión (última "pregunta", antes del resultado) —
+  // obligatoria para ver el resultado.
+  document.getElementById('professionContinueBtn').addEventListener('click', function() {
+    const profession = document.getElementById('leadProfession').value.trim();
+    const errorEl = document.getElementById('professionError');
+
+    if (!profession) {
+      errorEl.hidden = false;
+      return;
+    }
+    errorEl.hidden = true;
+    leadData.profession = profession;
+    showResult();
   });
 
   // Delegación de eventos para todas las opciones y botones de volver
@@ -602,7 +709,10 @@
         updateProgress(currentIndex);
         goToScreen('question-' + currentIndex);
       } else {
-        showResult();
+        // Última pregunta respondida: todavía falta la profesión antes
+        // de mostrar el resultado (goToScreen('result') pasa recién
+        // dentro de showResult(), que dispara professionContinueBtn).
+        goToScreen('profession');
       }
     }
 
@@ -629,14 +739,37 @@
     document.getElementById('resultDesc').textContent = profile.desc;
     document.getElementById('resultProgram').textContent = profile.program;
 
-    const message = encodeURIComponent(
-      'Hola! Acabo de hacer el autodiagnóstico de Evolution y mi resultado fue: "' + profile.title + '". Quiero más información sobre el entrenamiento.'
-    );
-    document.getElementById('resultCta').setAttribute('href', 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + message);
+    submitLead(profile);
 
     progressBar.style.width = '100%';
     progressLabel.textContent = 'Completado';
     goToScreen('result');
+  }
+
+  // Registra el lead (nombre, WhatsApp, profesión, resultado) en la hoja
+  // de cálculo vía el Web App de Apps Script. mode:'no-cors' + Content-Type
+  // text/plain evitan el preflight OPTIONS, que Apps Script no siempre
+  // maneja bien — a cambio no podemos leer la respuesta, pero no hace
+  // falta: si falla, se loguea en consola y no interrumpe a la persona,
+  // que igual ve su resultado.
+  function submitLead(profile) {
+    if (!SHEETS_WEBHOOK_URL || SHEETS_WEBHOOK_URL.indexOf('PASTE_') === 0) {
+      console.warn('Autodiagnóstico: falta configurar SHEETS_WEBHOOK_URL — este lead no se registró en la hoja.');
+      return;
+    }
+    fetch(SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        nombre: leadData.name,
+        whatsapp: leadData.whatsapp,
+        profesion: leadData.profession,
+        resultado: profile.title
+      })
+    }).catch(function (e) {
+      console.error('Autodiagnóstico: no se pudo registrar el lead en la hoja:', e);
+    });
   }
 
   document.getElementById('retryBtn').addEventListener('click', function() {
