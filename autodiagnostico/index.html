@@ -4,6 +4,39 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Autodiagnóstico — Evolution: High Performance Training</title>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M08009QZ8J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-M08009QZ8J');
+</script>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1549727383501191');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1549727383501191&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+<!-- Eventos específicos de esta página (Autodiagnóstico) -->
+<script>
+gtag('event', 'view_autodiagnostico');
+</script>
+
 <style>
   :root {
     --navy-deep: #05070F;
@@ -427,7 +460,7 @@
       <div class="result-panel-text" id="resultProgram"></div>
     </div>
 
-    <a href="/programa" class="result-cta" id="resultCta">
+    <a href="/programa" class="result-cta" id="resultCta" onclick="fbq('track','Lead');gtag('event','click_desde_resultado_test');">
       Quiero trabajar en esto →
     </a>
     <button class="result-retry" id="retryBtn">Volver a hacer el test</button>
@@ -738,6 +771,9 @@
     document.getElementById('resultTitle').textContent = profile.title;
     document.getElementById('resultDesc').textContent = profile.desc;
     document.getElementById('resultProgram').textContent = profile.program;
+
+    fbq('track', 'CompleteRegistration', {content_name: 'Autodiagnóstico Evolution'});
+    gtag('event', 'test_completado');
 
     submitLead(profile);
 

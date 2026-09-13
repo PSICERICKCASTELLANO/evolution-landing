@@ -4,6 +4,40 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Evolution: High Performance Training — El Programa</title>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M08009QZ8J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-M08009QZ8J');
+</script>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1549727383501191');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1549727383501191&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+<!-- Eventos específicos de esta página (Programa) -->
+<script>
+fbq('track', 'ViewContent', {content_name: 'Programa Evolution'});
+gtag('event', 'view_pagina_programa');
+</script>
+
 <style>
   :root {
     --navy-deep: #05070F;
@@ -1290,7 +1324,10 @@
     }
 
     tabs.forEach(function (tab) {
-      tab.addEventListener('click', function () { render(tab.dataset.modality); });
+      tab.addEventListener('click', function () {
+        gtag('event', 'select_modalidad', { modalidad: tab.dataset.modality });
+        render(tab.dataset.modality);
+      });
     });
 
     // Al hacer clic en "Reservar" no se abre el checkout directo — primero
@@ -1347,6 +1384,8 @@
     }
 
     buyBtn.addEventListener('click', function () {
+      fbq('track', 'InitiateCheckout');
+      gtag('event', 'click_comprar', { modalidad: currentModality });
       checkoutWrap.hidden = false;
       renderPaymentChoice();
       checkoutWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
