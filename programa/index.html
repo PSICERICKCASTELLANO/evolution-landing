@@ -151,17 +151,31 @@
     margin-bottom: 24px;
   }
   .price-old {
-    font-family: 'Inter', sans-serif; font-size: 15px; color: var(--steel-dim);
-    text-decoration: line-through; text-decoration-color: rgba(150,167,219,0.5);
+    font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 700; color: var(--steel-dim);
+    text-decoration: line-through; text-decoration-color: rgba(150,167,219,0.6); text-decoration-thickness: 2px;
   }
   .price-new { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; color: var(--orange-bright); }
   .price-tag {
     font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
     color: var(--cream); background: rgba(255,126,32,0.25); padding: 5px 10px; border-radius: 999px;
   }
-  /* Monto total de Dúo/Trío (precio de arriba es por persona) */
-  .price-total-note { font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--steel-dim); margin: -16px 0 20px; }
-  .price-total-note[hidden] { display: none; }
+  /* Ahorro explícito de Dúo/Trío — a propósito mucho más notorio que una
+     nota al pie: la idea es que el ahorro se lea como algo que se pierde
+     por venir solo, no como un dato más. */
+  .price-savings {
+    display: inline-flex; align-items: center; gap: 6px; margin: -16px 0 20px;
+    padding: 8px 16px; border-radius: 999px;
+    background: rgba(255,126,32,0.16); border: 1px solid rgba(255,126,32,0.4);
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 800; color: var(--orange-bright);
+  }
+  .price-savings[hidden] { display: none; }
+  /* Urgencia del plazo de preventa — misma para las 3 modalidades (el
+     plazo no cambia), por eso es un párrafo fijo en el HTML, no algo
+     que arme el JS del selector. */
+  .price-urgency {
+    display: flex; align-items: center; gap: 6px; margin: -8px 0 20px;
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; color: var(--orange-bright);
+  }
 
   .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
   .btn-primary {
@@ -836,7 +850,9 @@
               <span class="price-tag" id="modalityPriceTag">PREVENTA HASTA EL 19/09</span>
             </div>
 
-            <p class="price-total-note" id="modalityPriceTotal" hidden></p>
+            <p class="price-savings" id="modalityPriceSavings" hidden></p>
+
+            <p class="price-urgency">⏳ Quedan 7 días de preventa — después el precio sube a regular.</p>
 
             <div class="hero-ctas step-ctas">
               <button type="button" class="btn-primary" id="modalityBuyBtn">Reservar mi plaza →</button>
@@ -1181,29 +1197,29 @@
         priceNew: '$550',
         priceTag: 'PREVENTA HASTA EL 19/09',
         perPerson: false,
-        total: null,
+        savings: 'Ahorras $300',
         note: 'Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.',
         buttonText: 'Reservar mi plaza →',
         offer: 'OFERTA_INDIVIDUAL_PLACEHOLDER',
         label: 'Individual'
       },
       duo: {
-        priceOld: null,
-        priceNew: '$770',
+        priceOld: '$770',
+        priceNew: '$500',
         priceTag: null,
         perPerson: true,
-        total: 'Total $1540 por las 2 plazas',
+        savings: 'Ahorras $350 c/u',
         note: 'Precio por persona, pagando juntos — 2 plazas.',
         buttonText: 'Reservar nuestras 2 plazas →',
         offer: 'OFERTA_DUO_PLACEHOLDER',
         label: 'Dúo (2 personas)'
       },
       trio: {
-        priceOld: null,
-        priceNew: '$660',
+        priceOld: '$660',
+        priceNew: '$475',
         priceTag: null,
         perPerson: true,
-        total: 'Total $1980 por las 3 plazas',
+        savings: 'Ahorras $375 c/u',
         note: 'Precio por persona, pagando juntos — 3 plazas.',
         buttonText: 'Reservar nuestras 3 plazas →',
         offer: 'OFERTA_TRIO_PLACEHOLDER',
@@ -1216,7 +1232,7 @@
     const priceNewEl = document.getElementById('modalityPriceNew');
     const pricePerEl = document.getElementById('modalityPricePer');
     const priceTagEl = document.getElementById('modalityPriceTag');
-    const priceTotalEl = document.getElementById('modalityPriceTotal');
+    const priceSavingsEl = document.getElementById('modalityPriceSavings');
     const noteEl = document.getElementById('modalityNote');
     const buyBtn = document.getElementById('modalityBuyBtn');
     const checkoutWrap = document.getElementById('inline_checkout');
@@ -1250,8 +1266,8 @@
       priceTagEl.hidden = !data.priceTag;
       if (data.priceTag) priceTagEl.textContent = data.priceTag;
 
-      priceTotalEl.hidden = !data.total;
-      if (data.total) priceTotalEl.textContent = data.total;
+      priceSavingsEl.hidden = !data.savings;
+      if (data.savings) priceSavingsEl.textContent = data.savings;
 
       noteEl.innerHTML = data.note;
       buyBtn.textContent = data.buttonText;
