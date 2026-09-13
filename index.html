@@ -933,6 +933,10 @@
     transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
   }
   .payment-choice-option:hover { border-color: var(--orange); background: rgba(255,126,32,0.08); transform: translateY(-1px); }
+  /* Mientras el widget de Hotmart todavía está cargando — clickearlo
+     antes no hace nada, así que se lo deshabilita en vez de dejarlo
+     parecer roto. */
+  .payment-choice-option.is-loading { opacity: 0.5; pointer-events: none; cursor: default; }
   .payment-choice-title { font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 700; color: var(--cream); }
   .payment-choice-desc { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 300; color: var(--steel); }
 
@@ -1850,24 +1854,34 @@
 </script>
 
 <script>
-  // ===== Paso 3: selector de modalidad + checkout embebido de Hotmart =====
-  // Cada modalidad es una oferta distinta en Hotmart — reemplazar estos 3
-  // códigos por los reales una vez creadas las ofertas en Hotmart.
+  // ===== Paso 3: selector de modalidad + checkout de Hotmart =====
+  // Cada modalidad es una oferta distinta en Hotmart (códigos reales,
+  // confirmados por el usuario 2026-09-12). Usa el widget clásico de
+  // Hotmart (hotmart-fb — botón + lightbox), no el checkout embebido
+  // ("Checkout Elements"): se probó con los códigos reales y ese offer
+  // no existe ahí ("Offer not found"), es de otro sistema.
   //
-  // El script de Hotmart (hotmart-checkout-elements.js) se carga recién al
-  // primer clic en "Reservar", no de entrada — así nadie descarga ese
-  // script de terceros solo por visitar la página, y el checkout nunca
-  // aparece antes de que la persona elija comprar.
+  // El script del widget (widget.min.js, que a su vez carga jQuery +
+  // Fancybox) se empieza a cargar recién al hacer clic en "Reservar" —
+  // no de entrada — así nadie descarga esos scripts de terceros solo
+  // por visitar la página. Para cuando la persona llega a tocar "Pagar
+  // con tarjeta" (un paso más adentro, eligiendo forma de pago primero)
+  // ya tuvo tiempo de sobra de terminar de cargar.
   (function () {
     let hotmartScriptPromise = null;
     function loadHotmartScript() {
       if (hotmartScriptPromise) return hotmartScriptPromise;
       hotmartScriptPromise = new Promise(function (resolve, reject) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://static.hotmart.com/css/hotmart-fb.min.css';
+        document.head.appendChild(link);
+
         const script = document.createElement('script');
-        script.src = 'https://checkout.hotmart.com/lib/hotmart-checkout-elements.js';
+        script.src = 'https://static.hotmart.com/checkout/widget.min.js';
         script.onload = resolve;
         script.onerror = reject;
-        document.body.appendChild(script);
+        document.head.appendChild(script);
       });
       return hotmartScriptPromise;
     }
@@ -1881,7 +1895,7 @@
         savings: 'Ahorras $300',
         note: 'Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.',
         buttonText: 'Reservar mi plaza →',
-        offer: 'OFERTA_INDIVIDUAL_PLACEHOLDER',
+        offer: 'E107588826A',
         label: 'Individual'
       },
       duo: {
@@ -1892,7 +1906,7 @@
         savings: 'Ahorras $350 c/u',
         note: 'Precio por persona, pagando juntos — 2 plazas.',
         buttonText: 'Reservar nuestras 2 plazas →',
-        offer: 'OFERTA_DUO_PLACEHOLDER',
+        offer: 'Q107589032I',
         label: 'Dúo (2 personas)'
       },
       trio: {
@@ -1903,7 +1917,7 @@
         savings: 'Ahorras $375 c/u',
         note: 'Precio por persona, pagando juntos — 3 plazas.',
         buttonText: 'Reservar nuestras 3 plazas →',
-        offer: 'OFERTA_TRIO_PLACEHOLDER',
+        offer: 'S107589135A',
         label: 'Trío (3 personas)'
       }
     };
@@ -1964,20 +1978,44 @@
     // se elige la forma de pago (transferencia con asesor, o tarjeta en
     // línea vía Hotmart). Las dos opciones se renderizan adentro del mismo
     // contenedor que antes mostraba el checkout ("inline_checkout").
+    //
+    // "Pagar con tarjeta" es directamente el link real de Hotmart con la
+    // clase hotmart-fb — el propio widget.min.js (cargado más abajo) le
+    // engancha el clic para abrir su lightbox con el checkout real; acá
+    // no hay nada que orquestar a mano del lado nuestro. No lleva la
+    // clase hotmart__button-checkout que trae el snippet de Hotmart —
+    // esa es solo decorativa (el botón verde de Hotmart) y no la usa el
+    // script para nada (confirmado revisando widget.min.js); con
+    // payment-choice-option alcanza para que se vea igual que el resto.
+    //
+    // Empieza deshabilitado ("Cargando…") hasta que el widget realmente
+    // termine de cargar — clickearlo antes no hace nada (el manejador de
+    // clic todavía no existe), así que hay que evitar ese clic en falso
+    // en vez de solo confiar en que el usuario tarde lo suficiente en
+    // elegir.
     function renderPaymentChoice() {
+      const data = MODALITIES[currentModality];
       checkoutWrap.innerHTML =
         '<div class="payment-choice">' +
           '<button type="button" class="payment-choice-option" id="payTransferBtn">' +
             '<span class="payment-choice-title">Pagar vía transferencia</span>' +
             '<span class="payment-choice-desc">Te contactaremos con un asesor</span>' +
           '</button>' +
-          '<button type="button" class="payment-choice-option" id="payCardBtn">' +
+          '<a href="https://pay.hotmart.com/' + data.offer + '?checkoutMode=2" onclick="return false;" class="hotmart-fb payment-choice-option is-loading" id="payCardBtn">' +
             '<span class="payment-choice-title">Pagar con tarjeta</span>' +
-            '<span class="payment-choice-desc">Pago en línea</span>' +
-          '</button>' +
+            '<span class="payment-choice-desc" id="payCardDesc">Cargando…</span>' +
+          '</a>' +
         '</div>';
       document.getElementById('payTransferBtn').addEventListener('click', startTransferPayment);
-      document.getElementById('payCardBtn').addEventListener('click', startCardCheckout);
+
+      const payCardBtn = document.getElementById('payCardBtn');
+      loadHotmartScript().then(function () {
+        payCardBtn.classList.remove('is-loading');
+        document.getElementById('payCardDesc').textContent = 'Pago en línea';
+      }).catch(function (e) {
+        console.error('No se pudo cargar el widget de Hotmart:', e);
+        document.getElementById('payCardDesc').textContent = 'No se pudo cargar — probá de nuevo';
+      });
     }
 
     // Transferencia: no hay checkout propio — abre WhatsApp con el mensaje
@@ -1987,25 +2025,6 @@
       const message = 'Hola, quiero reservar mi plaza para Evolution (modalidad: ' + data.label + ') y pagar vía transferencia.';
       window.open('https://wa.me/51997473509?text=' + encodeURIComponent(message), '_blank', 'noopener');
       checkoutWrap.innerHTML = '<p class="checkout-loading">Te escribimos por WhatsApp para coordinar el pago por transferencia.</p>';
-    }
-
-    // Tarjeta: mismo flujo de checkout embebido de Hotmart que había antes.
-    function startCardCheckout() {
-      const data = MODALITIES[currentModality];
-      checkoutWrap.innerHTML = '<p class="checkout-loading">Cargando el pago seguro…</p>';
-
-      loadHotmartScript().then(function () {
-        checkoutWrap.innerHTML = '';
-        const elements = checkoutElements.init('inlineCheckout', { offer: data.offer });
-        elements.mount('#inline_checkout');
-      }).catch(function (e) {
-        // Con un código de oferta placeholder (todavía sin reemplazar por
-        // el real de Hotmart), o si el script de Hotmart no llega a
-        // cargar, esto puede fallar — no debe romper la página, solo
-        // avisa acá adentro en vez de dejarlo colgado en "Cargando…".
-        console.error('No se pudo montar el checkout de Hotmart:', e);
-        checkoutWrap.innerHTML = '<p class="checkout-loading">No se pudo cargar el pago. Intenta de nuevo o escríbenos por WhatsApp.</p>';
-      });
     }
 
     buyBtn.addEventListener('click', function () {
