@@ -4,6 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Evolution: High Performance Training — Erick Castellano</title>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M08009QZ8J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-M08009QZ8J');
+</script>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1681815172686209');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1681815172686209&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
 <style>
   :root {
     --navy-deep: #05070F;
@@ -1038,7 +1066,7 @@
 <nav class="nav">
   <div class="nav-inner">
     <div class="nav-logo">Evolution<span class="accent">.</span></div>
-    <a href="/programa" class="nav-cta">Reservar mi plaza</a>
+    <a href="/programa" class="nav-cta" onclick="fbq('track','Lead');gtag('event','click_reservar_landing');">Reservar mi plaza</a>
   </div>
 </nav>
 
@@ -1064,7 +1092,7 @@
   </div>
 
   <div class="hero-ctas">
-    <a href="/programa" class="btn-primary">Reservar mi plaza →</a>
+    <a href="/programa" class="btn-primary" onclick="fbq('track','Lead');gtag('event','click_reservar_landing');">Reservar mi plaza →</a>
     <a href="https://wa.me/51997473509?text=Quiero%20hablar%20con%20un%20asesor%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Hablar con un asesor →</a>
   </div>
 
@@ -1098,7 +1126,7 @@
   </div>
 
   <div style="display:flex; justify-content:center; margin-top:28px;">
-    <a href="/autodiagnostico" class="btn-secondary">Hacer mi autodiagnóstico →</a>
+    <a href="/autodiagnostico" class="btn-secondary" onclick="fbq('trackCustom','ClickAutodiagnostico');gtag('event','click_autodiagnostico_landing');">Hacer mi autodiagnóstico →</a>
   </div>
 </section>
 
@@ -1357,7 +1385,7 @@
   </div>
 
   <div class="hero-ctas" style="margin-top:40px;">
-    <a href="/programa" class="btn-primary">Reservar mi plaza →</a>
+    <a href="/programa" class="btn-primary" onclick="fbq('track','Lead');gtag('event','click_reservar_landing');">Reservar mi plaza →</a>
     <a href="https://wa.me/51997473509?text=Quiero%20hablar%20con%20un%20asesor%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Hablar con un asesor →</a>
   </div>
 </section>
@@ -1406,7 +1434,7 @@
   </div>
 
   <div class="hero-ctas" style="margin-top:40px;">
-    <a href="/programa" class="btn-primary">Reservar mi plaza →</a>
+    <a href="/programa" class="btn-primary" onclick="fbq('track','Lead');gtag('event','click_reservar_landing');">Reservar mi plaza →</a>
     <a href="https://wa.me/51997473509?text=Quiero%20hablar%20con%20un%20asesor%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Hablar con un asesor →</a>
   </div>
 </section>
@@ -1599,7 +1627,7 @@
   </div>
 
   <div class="hero-ctas" style="margin-top:40px;">
-    <a href="/programa" class="btn-primary">Reservar mi plaza →</a>
+    <a href="/programa" class="btn-primary" onclick="fbq('track','Lead');gtag('event','click_reservar_landing');">Reservar mi plaza →</a>
     <a href="https://wa.me/51997473509?text=Quiero%20hablar%20con%20un%20asesor%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Hablar con un asesor →</a>
   </div>
 </section>
@@ -1662,7 +1690,7 @@
   </div>
 
   <div class="hero-ctas">
-    <a href="/programa" class="btn-primary">Reservar mi plaza →</a>
+    <a href="/programa" class="btn-primary" onclick="fbq('track','Lead');gtag('event','click_reservar_landing');">Reservar mi plaza →</a>
     <a href="https://wa.me/51997473509?text=Quiero%20hablar%20con%20un%20asesor%20sobre%20Evolution" class="btn-secondary" target="_blank" rel="noopener">Hablar con un asesor →</a>
   </div>
 </section>
@@ -1971,7 +1999,10 @@
     }
 
     tabs.forEach(function (tab) {
-      tab.addEventListener('click', function () { render(tab.dataset.modality); });
+      tab.addEventListener('click', function () {
+        gtag('event', 'select_modalidad', { modalidad: tab.dataset.modality });
+        render(tab.dataset.modality);
+      });
     });
 
     // Al hacer clic en "Reservar" no se abre el checkout directo — primero
@@ -2028,6 +2059,8 @@
     }
 
     buyBtn.addEventListener('click', function () {
+      fbq('track', 'InitiateCheckout');
+      gtag('event', 'click_comprar', { modalidad: currentModality });
       checkoutWrap.hidden = false;
       renderPaymentChoice();
       checkoutWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
