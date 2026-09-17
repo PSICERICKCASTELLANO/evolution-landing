@@ -932,9 +932,14 @@ gtag('event', 'view_pagina_claridad_landing');
     font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.6; color: var(--cream-dim); font-weight: 300;
   }
 
-  /* Widget de Calendly embebido en la página */
+  /* Widget de Calendly embebido en la página — a propósito ocupa el ancho
+     completo de la sección (afuera de .paso3-grid, ver el HTML) en vez del
+     ancho de una sola columna: por debajo de ~620px de ancho Calendly
+     apila su propio layout (info arriba, calendario abajo, muy vertical);
+     con más ancho lo muestra en 2 columnas lado a lado, mucho más
+     horizontal — ver .paso3-section más abajo para el ancho máximo. */
   .calendly-inline-wrap {
-    margin-top: 8px; border-radius: 16px; overflow: hidden;
+    margin-top: 40px; border-radius: 16px; overflow: hidden;
     border: 1px solid rgba(150,167,219,0.18); background: var(--navy-mid);
   }
   .calendly-inline-wrap[hidden] { display: none; }
@@ -944,7 +949,7 @@ gtag('event', 'view_pagina_claridad_landing');
      si tuviera esa clase el auto-scan de Calendly intentaría inicializarlo
      también él solo, sin data-url, y tira un error ("Cannot read
      properties of null (reading 'split')") que rompe el widget.js. */
-  .claridad-calendly-target { min-width: 280px; height: 700px; }
+  .claridad-calendly-target { width: 100%; min-width: 280px; height: 690px; }
 
   /* ============ POR DENTRO: video de módulos ============ */
   .modulos-section { max-width: 1100px; }
@@ -1255,21 +1260,24 @@ gtag('event', 'view_pagina_claridad_landing');
            el <head>) vía el botón real de esta página. -->
       <div class="claridad-block">
         <div class="includes-title">Agenda tu sesión de claridad</div>
-        <p class="claridad-desc">Una conversación 1:1 con Erick, de unos 20 minutos, para resolver tus dudas sobre el programa y ver juntos si Evolution encaja con lo que estás buscando.</p>
+        <p class="claridad-desc">Una conversación 1:1 de unos 20 minutos con nuestro equipo, para resolver tus dudas sobre el programa y ver juntos si Evolution encaja con lo que estás buscando.</p>
       </div>
 
       <div class="hero-ctas paso3-ctas">
         <button type="button" class="btn-primary" id="claridadBuyBtn">Agendar mi sesión de claridad →</button>
       </div>
-
-      <!-- Widget de Calendly embebido — oculto hasta que se hace clic en
-           "Agendar", openCalendly() (definido en el <head>) lo arma recién
-           la primera vez y lo muestra. -->
-      <div id="calendlyInlineWrap" class="calendly-inline-wrap" hidden>
-        <div id="calendlyInlineWidget" class="claridad-calendly-target"></div>
-      </div>
     </div>
 
+  </div>
+
+  <!-- Widget de Calendly embebido — afuera de .paso3-grid a propósito,
+       para que use el ancho completo de la sección en vez de quedar
+       apretado en la mitad de las 2 columnas (ahí Calendly lo renderiza
+       en su layout angosto/apilado, mucho más vertical). Oculto hasta que
+       se hace clic en "Agendar"; openCalendly() (definido en el <head>)
+       lo arma recién la primera vez y lo muestra. -->
+  <div id="calendlyInlineWrap" class="calendly-inline-wrap" hidden>
+    <div id="calendlyInlineWidget" class="claridad-calendly-target"></div>
   </div>
 </section>
 
