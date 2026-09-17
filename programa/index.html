@@ -605,8 +605,16 @@ gtag('event', 'view_pagina_programa');
      antes no hace nada, así que se lo deshabilita en vez de dejarlo
      parecer roto. */
   .payment-choice-option.is-loading { opacity: 0.5; pointer-events: none; cursor: default; }
+  .payment-choice-title-row { display: flex; align-items: center; gap: 8px; }
   .payment-choice-title { font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 700; color: var(--cream); }
   .payment-choice-desc { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 300; color: var(--steel); }
+  /* Resalta las cuotas de "Pagar con tarjeta" — mismo lenguaje visual
+     que el tag de precio (píldora naranja), para que se note sin tener
+     que leer la descripción de abajo. */
+  .payment-choice-badge {
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--cream); background: rgba(255,126,32,0.25); padding: 3px 8px; border-radius: 999px;
+  }
 
   /* Grid de videos-placeholder del Paso 2 */
   .faq-video-grid {
@@ -1359,7 +1367,10 @@ gtag('event', 'view_pagina_programa');
             '<span class="payment-choice-desc">Te contactaremos con un asesor</span>' +
           '</button>' +
           '<a href="https://pay.hotmart.com/' + data.offer + '?checkoutMode=2" onclick="return false;" class="hotmart-fb payment-choice-option is-loading" id="payCardBtn">' +
-            '<span class="payment-choice-title">Pagar con tarjeta</span>' +
+            '<span class="payment-choice-title-row">' +
+              '<span class="payment-choice-title">Pagar con tarjeta</span>' +
+              '<span class="payment-choice-badge">Hasta 6 cuotas</span>' +
+            '</span>' +
             '<span class="payment-choice-desc" id="payCardDesc">Cargando…</span>' +
           '</a>' +
         '</div>';
