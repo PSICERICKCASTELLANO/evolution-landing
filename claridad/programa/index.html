@@ -72,6 +72,19 @@ gtag('event', 'view_pagina_claridad');
     wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return false;
   }
+
+  // Calendly manda este postMessage al frame padre justo cuando la persona
+  // confirma una cita (no cuando solo abre el widget) — es la única forma
+  // confiable de medir agendamientos reales en vez de clics con intención.
+  // Ver openCalendly() arriba: el clic en el botón dispara fbq('Lead') +
+  // click_agendar_sesion (intención); esto de acá dispara fbq('Schedule')
+  // + agenda_confirmada (agendamiento real), recién cuando Calendly avisa.
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.event === 'calendly.event_scheduled') {
+      fbq('track', 'Schedule');
+      gtag('event', 'agenda_confirmada');
+    }
+  });
 </script>
 
 <style>
@@ -728,7 +741,7 @@ gtag('event', 'view_pagina_claridad');
   </div>
 
   <div class="hero-ctas">
-    <a href="#paso-3" class="btn-primary" onclick="fbq('track','Schedule');gtag('event','click_agendar_sesion');openCalendly();">Agendar mi sesión de claridad →</a>
+    <a href="#paso-3" class="btn-primary" onclick="fbq('track','Lead');gtag('event','click_agendar_sesion');openCalendly();">Agendar mi sesión de claridad →</a>
   </div>
 </section>
 
@@ -1208,10 +1221,13 @@ gtag('event', 'view_pagina_claridad');
 
 <script>
   // ===== Paso 3: botón real — agenda la sesión de claridad vía Calendly =====
+  // fbq('Lead') acá mide intención (clic en el botón); fbq('Schedule') real
+  // se dispara aparte, en el listener de 'calendly.event_scheduled' (ver
+  // <head>), recién cuando la persona confirma la cita de verdad.
   (function () {
     const buyBtn = document.getElementById('claridadBuyBtn');
     buyBtn.addEventListener('click', function () {
-      fbq('track', 'Schedule');
+      fbq('track', 'Lead');
       gtag('event', 'click_agendar_sesion');
       openCalendly();
     });
