@@ -931,6 +931,7 @@ src="https://www.facebook.com/tr?id=1681815172686209&ev=PageView&noscript=1"
     display: flex; align-items: center; gap: 6px; margin: -8px 0 20px;
     font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; color: var(--orange-bright);
   }
+  .price-urgency[hidden] { display: none; }
 
   .hero-plazas {
     font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--steel-dim); margin-top: 18px;
@@ -1293,12 +1294,12 @@ src="https://www.facebook.com/tr?id=1681815172686209&ev=PageView&noscript=1"
           <span class="price-new" id="modalityPriceNew">$550</span>
           <span class="price-per" id="modalityPricePer" hidden>/persona</span>
         </span>
-        <span class="price-tag" id="modalityPriceTag">PREVENTA HASTA EL 19/09</span>
+        <span class="price-tag" id="modalityPriceTag">PREVENTA HASTA EL 20/09</span>
       </div>
 
       <p class="price-savings" id="modalityPriceSavings" hidden></p>
 
-      <p class="price-urgency">⏳ Quedan 7 días de preventa — después el precio sube a regular.</p>
+      <p class="price-urgency" id="priceUrgency"></p>
 
       <div class="hero-ctas paso3-ctas">
         <button type="button" class="btn-primary" id="modalityBuyBtn">Reservar mi plaza →</button>
@@ -1918,7 +1919,7 @@ src="https://www.facebook.com/tr?id=1681815172686209&ev=PageView&noscript=1"
       individual: {
         priceOld: '$850',
         priceNew: '$550',
-        priceTag: 'PREVENTA HASTA EL 19/09',
+        priceTag: 'PREVENTA HASTA EL 20/09',
         perPerson: false,
         savings: 'Ahorras $300',
         note: 'Solo <strong>5 plazas</strong> a este precio — hasta una semana antes del inicio.',
@@ -2067,6 +2068,49 @@ src="https://www.facebook.com/tr?id=1681815172686209&ev=PageView&noscript=1"
     });
 
     render('individual');
+  })();
+</script>
+
+<script>
+  // ===== Contador de días de preventa =====
+  // Plazo fijo: preventa vigente hasta el 20/09/2026 inclusive (mismo
+  // plazo que el tag "PREVENTA HASTA EL 20/09" de arriba), hora Perú
+  // (America/Lima) — igual para todos los visitantes sin importar su
+  // huso horario, por eso se calcula la fecha de "hoy" con
+  // Intl.DateTimeFormat + timeZone en vez de usar la hora local del
+  // navegador.
+  (function () {
+    const DEADLINE = { year: 2026, month: 9, day: 20 };
+
+    function limaDateParts(date) {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Lima', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).formatToParts(date);
+      function get(type) { return parseInt(parts.find(function (p) { return p.type === type; }).value, 10); }
+      return { year: get('year'), month: get('month'), day: get('day') };
+    }
+
+    function daysUntilDeadline() {
+      const today = limaDateParts(new Date());
+      const todayUTC = Date.UTC(today.year, today.month - 1, today.day);
+      const deadlineUTC = Date.UTC(DEADLINE.year, DEADLINE.month - 1, DEADLINE.day);
+      return Math.round((deadlineUTC - todayUTC) / 86400000);
+    }
+
+    const el = document.getElementById('priceUrgency');
+    if (!el) return;
+
+    const daysLeft = daysUntilDeadline();
+
+    if (daysLeft > 1) {
+      el.textContent = '⏳ Quedan ' + daysLeft + ' días de preventa — después el precio sube a regular.';
+    } else if (daysLeft === 1) {
+      el.textContent = '⏳ Queda 1 día de preventa — después el precio sube a regular.';
+    } else if (daysLeft === 0) {
+      el.textContent = '⏳ ¡Último día de preventa! — después el precio sube a regular.';
+    } else {
+      el.hidden = true;
+    }
   })();
 </script>
 
