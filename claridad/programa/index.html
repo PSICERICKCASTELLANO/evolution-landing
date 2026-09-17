@@ -38,12 +38,38 @@ fbq('track', 'ViewContent', {content_name: 'Programa Evolution - Sesión de Clar
 gtag('event', 'view_pagina_claridad');
 </script>
 
-<!-- Calendly (widget embebido) -->
+<!-- Calendly (widget embebido en la página, no popup) -->
 <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
 <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 <script type="text/javascript">
+  // Despliega el widget de Calendly directamente en la página (adentro de
+  // #calendlyInlineWidget, en el Paso 3) en vez de abrirlo como popup.
+  // Recién arma el iframe la primera vez que se llama (no de entrada, para
+  // no cargarlo en cada visita) — llamadas siguientes solo hacen scroll.
+  // widget.js se carga async en el <head>, así que si todavía no terminó
+  // de cargar cuando alguien hace clic, reintenta cada 150ms hasta que
+  // window.Calendly exista.
+  let calendlyInlineReady = false;
   function openCalendly() {
-    Calendly.initPopupWidget({url: 'https://calendly.com/emaromero-lamb/evolution'});
+    const wrap = document.getElementById('calendlyInlineWrap');
+    if (!wrap) return false;
+    wrap.hidden = false;
+
+    if (!calendlyInlineReady) {
+      (function initWhenReady() {
+        if (window.Calendly) {
+          calendlyInlineReady = true;
+          Calendly.initInlineWidget({
+            url: 'https://calendly.com/emaromero-lamb/evolution',
+            parentElement: document.getElementById('calendlyInlineWidget')
+          });
+        } else {
+          setTimeout(initWhenReady, 150);
+        }
+      })();
+    }
+
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return false;
   }
 </script>
@@ -581,6 +607,20 @@ gtag('event', 'view_pagina_claridad');
     font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.6; color: var(--cream-dim); font-weight: 300;
   }
 
+  /* Widget de Calendly embebido en la página */
+  .calendly-inline-wrap {
+    margin-top: 8px; border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(150,167,219,0.18); background: var(--navy-mid);
+  }
+  .calendly-inline-wrap[hidden] { display: none; }
+  /* Ojo: a propósito NO se llama "calendly-inline-widget" — ese nombre de
+     clase lo escanea automáticamente widget.js buscando un data-url; como
+     este contenedor lo llenamos nosotros vía Calendly.initInlineWidget(),
+     si tuviera esa clase el auto-scan de Calendly intentaría inicializarlo
+     también él solo, sin data-url, y tira un error ("Cannot read
+     properties of null (reading 'split')") que rompe el widget.js. */
+  .claridad-calendly-target { min-width: 280px; height: 700px; }
+
   /* Grid de videos-placeholder del Paso 2 */
   .faq-video-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
@@ -853,6 +893,13 @@ gtag('event', 'view_pagina_claridad');
 
             <div class="hero-ctas step-ctas">
               <button type="button" class="btn-primary" id="claridadBuyBtn">Agendar mi sesión de claridad →</button>
+            </div>
+
+            <!-- Widget de Calendly embebido — oculto hasta que se hace clic
+                 en "Agendar", openCalendly() (definido en el <head>) lo
+                 arma recién la primera vez y lo muestra. -->
+            <div id="calendlyInlineWrap" class="calendly-inline-wrap" hidden>
+              <div id="calendlyInlineWidget" class="claridad-calendly-target"></div>
             </div>
           </div>
 
