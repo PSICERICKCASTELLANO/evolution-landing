@@ -79,12 +79,25 @@ gtag('event', 'view_pagina_claridad_landing');
   // Ver openCalendly() arriba: el clic en el botón dispara fbq('Lead') +
   // click_agendar_sesion (intención); esto de acá dispara fbq('Schedule')
   // + agenda_confirmada (agendamiento real), recién cuando Calendly avisa.
+  //
+  // scheduleFired asegura que fbq('Schedule') se dispare como máximo una
+  // vez por sesión de página, aunque Calendly reenvíe el mismo postMessage
+  // 'calendly.event_scheduled' más de una vez para la misma cita.
+  let scheduleFired = false;
+  // TEMPORAL — debug: cuenta cuántas veces llega específicamente
+  // 'calendly.event_scheduled' en esta sesión (debería ser 1). Quitar
+  // junto con el console.log de abajo apenas se confirme el diagnóstico.
+  let eventScheduledCount = 0;
   window.addEventListener('message', function (e) {
     // TEMPORAL — debug: loguea todo lo que llega por postMessage para ver
     // qué manda Calendly de verdad (quitar apenas se confirme el nombre
     // real del evento).
     console.log('Mensaje recibido:', e.data);
     if (e.data && e.data.event === 'calendly.event_scheduled') {
+      eventScheduledCount++;
+      console.log('calendly.event_scheduled recibido — van ' + eventScheduledCount + ' veces en esta sesión.');
+      if (scheduleFired) return;
+      scheduleFired = true;
       fbq('track', 'Schedule');
       gtag('event', 'agenda_confirmada');
     }
