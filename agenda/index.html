@@ -183,6 +183,31 @@ gtag('event', 'view_pagina_agenda');
     background: rgba(5,7,15,0.55); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-size: 20px; padding-left: 4px;
   }
 
+  /* Póster propio — cubre el iframe hasta que el player confirma que
+     está realmente reproduciendo (BUFFERING/PLAYING). El autoplay mudo
+     no siempre arranca solo en todos los navegadores/dispositivos (en
+     particular Safari de iOS es poco confiable con esto); sin este
+     póster, mientras tanto se ve la miniatura + botón rojo NATIVOS de
+     YouTube por debajo de nuestros overlays. Con el póster encima, la
+     persona siempre ve nuestro propio ícono de play, nunca el de
+     YouTube — clickearlo (vía .yt-click-catcher) arranca el video con
+     sonido igual, sea que el autoplay mudo haya funcionado o no. */
+  .yt-poster {
+    position: absolute; inset: 0; z-index: 4;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--navy-mid);
+    transition: opacity 0.3s ease;
+    /* No intercepta clics — es puramente visual, para que el toque le
+       siga llegando a .yt-click-catcher (z-index más bajo) por debajo. */
+    pointer-events: none;
+  }
+  .yt-poster span {
+    width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: rgba(255,126,32,0.16); border: 1px solid var(--border-orange); color: var(--orange-bright);
+    font-size: 22px; padding-left: 4px;
+  }
+  .yt-poster.is-loaded { opacity: 0; pointer-events: none; }
+
   /* ===== Barra de progreso del video (real, no decorativa) — ver
        mapBarProgress() en el script: en el primer tramo avanza más
        rápido que el tiempo real, después queda 1:1. ===== */
@@ -284,7 +309,14 @@ gtag('event', 'view_pagina_agenda');
   .erick-photo-wrap img { max-height: 100%; max-width: 100%; width: auto; object-fit: contain; object-position: bottom; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.25)); }
 
   @media (max-width: 640px) {
-    .fold { padding: 16px 20px 24px; }
+    /* En mobile el contenido del fold es bastante más bajo que el alto
+       real de pantalla (iPhones altos sobre todo) — con justify-
+       content:center (heredado de la regla base) eso dejaba un bloque
+       vacío grande arriba de "Evolution." y el titular, repartiendo el
+       espacio sobrante mitad arriba/mitad abajo. flex-start lo manda
+       todo abajo en vez de partirlo, así el contenido arranca pegado al
+       padding-top real. */
+    .fold { justify-content: flex-start; padding: 28px 20px 24px; }
     .agenda-sub { max-width: 100%; }
     .erick-card { grid-template-columns: 1fr; text-align: center; padding: 32px 24px 0; gap: 0; }
     .erick-quote, .erick-desc { max-width: 100%; margin-left: auto; margin-right: auto; }
@@ -315,6 +347,7 @@ gtag('event', 'view_pagina_agenda');
         <div class="yt-click-catcher"></div>
         <div class="yt-mute-badge">🔇 Toca para activar el sonido</div>
         <div class="yt-pause-icon"><span>▶</span></div>
+        <div class="yt-poster" id="ytPoster"><span>▶</span></div>
       </div>
     </div>
   </div>
@@ -451,8 +484,13 @@ gtag('event', 'view_pagina_agenda');
     function initPlayer() {
       const wrap = document.querySelector('.yt-player-wrap');
       const catcher = wrap.querySelector('.yt-click-catcher');
+      const poster = document.getElementById('ytPoster');
       let started = false;
       let pollInterval = null;
+
+      function hidePoster() {
+        poster.classList.add('is-loaded');
+      }
 
       function stopPolling() {
         if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
@@ -483,6 +521,10 @@ gtag('event', 'view_pagina_agenda');
             e.target.unloadModule('captions');
           },
           onStateChange: function (e) {
+            if (e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING) {
+              hidePoster();
+            }
+
             wrap.classList.toggle('is-paused', started && e.data === YT.PlayerState.PAUSED);
 
             if (!started) return; // no trackear el preview mudo en loop
@@ -506,6 +548,7 @@ gtag('event', 'view_pagina_agenda');
         if (!started) {
           started = true;
           wrap.classList.add('is-started');
+          hidePoster(); // defensivo: no depender solo de onStateChange
           player.unMute();
           player.seekTo(0);
           player.playVideo();
