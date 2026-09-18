@@ -129,9 +129,9 @@ gtag('event', 'view_pagina_agenda');
   .agenda-logo { font-weight: 800; font-size: 14px; letter-spacing: -0.01em; color: var(--cream); margin-bottom: 16px; }
   .agenda-logo .accent { color: var(--orange-bright); }
 
-  /* ===== FOLD — todo lo esencial (titular, video, barra, botón) debe
-       caber en una pantalla estándar de escritorio sin scroll. Por eso
-       centrado verticalmente en min-height:100vh (mismo patrón que
+  /* ===== FOLD — lo esencial (titular, video, botón) debe caber en una
+       pantalla estándar de escritorio sin scroll. Por eso centrado
+       verticalmente en min-height:100vh (mismo patrón que
        /autodiagnostico) en vez de simplemente apilado desde arriba. ===== */
   .fold {
     position: relative; z-index: 2;
@@ -243,20 +243,6 @@ gtag('event', 'view_pagina_agenda');
   }
   .yt-poster.is-loaded { opacity: 0; pointer-events: none; }
 
-  /* ===== Barra de progreso del video (real, no decorativa) — ver
-       mapBarProgress() en el script: en el primer tramo avanza más
-       rápido que el tiempo real, después queda 1:1. ===== */
-  .agenda-progress-track {
-    width: min(760px, 88vw, 72vh); height: 6px; border-radius: 6px;
-    background: rgba(150,167,219,0.14); overflow: hidden; margin: 12px auto 0;
-  }
-  .agenda-progress-bar {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, var(--orange-dim), var(--orange-bright));
-    border-radius: 6px; box-shadow: 0 0 12px rgba(255,126,32,0.5);
-    transition: width 0.25s linear;
-  }
-
   .btn-primary {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 16px 30px; border-radius: 13px; border: none;
@@ -268,27 +254,7 @@ gtag('event', 'view_pagina_agenda');
   }
   .btn-primary:hover { filter: brightness(1.08); transform: translateY(-2px); }
 
-  /* Bloqueado hasta el 25% del video — opacidad reducida + cursor
-     not-allowed en vez de solo ocultarlo, para que la persona entienda
-     que el botón existe pero todavía no está disponible. */
-  .agenda-cta { margin-top: 16px; }
-  .agenda-cta:disabled {
-    opacity: 0.38; cursor: not-allowed; filter: grayscale(0.4); box-shadow: none; transform: none !important;
-  }
-  .agenda-cta:disabled:hover { filter: grayscale(0.4); transform: none; }
-  /* Pequeño "pop" al habilitarse — no es solo un cambio brusco de opacidad. */
-  .agenda-cta.unlocked { animation: unlockPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  @keyframes unlockPop {
-    0% { transform: scale(0.94); }
-    55% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-
-  .agenda-hint {
-    font-family: 'Inter', sans-serif; font-size: 12px; color: var(--steel-dim);
-    margin-top: 8px; transition: opacity 0.3s ease, margin 0.3s ease, height 0.3s ease;
-  }
-  .agenda-hint.is-hidden { opacity: 0; height: 0; margin-top: 0; overflow: hidden; }
+  .agenda-cta { margin-top: 20px; }
 
   /* Widget de Calendly embebido en la página */
   .calendly-inline-wrap {
@@ -305,33 +271,26 @@ gtag('event', 'view_pagina_agenda');
      properties of null (reading 'split')") que rompe el widget.js. */
   .claridad-calendly-target { width: 100%; min-width: 320px; height: 700px; }
 
-  /* ===== Contenido que se desbloquea al 50% — hidden real (no ocupa
-       espacio) hasta ese punto, para no generar scroll de más mientras
-       está bloqueado. Al desbloquear, fade + slide suave. ===== */
-  .unlock-section {
-    position: relative; z-index: 2;
-    opacity: 0; transform: translateY(18px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    padding: 8px 0 80px;
-  }
-  .unlock-section.visible { opacity: 1; transform: translateY(0); }
-  .unlock-section[hidden] { display: none; }
+  /* ===== Contenido siempre visible debajo del fold — antes se
+       desbloqueaba recién al 50% del video; ahora nada depende de verlo,
+       así que esto es contenido normal en el flujo de la página. ===== */
+  .below-fold { position: relative; z-index: 2; padding: 8px 0 80px; }
 
-  .unlock-summary {
-    margin: 0 auto 44px; max-width: 460px; padding: 22px 24px; border-radius: 16px;
+  .info-card {
+    margin: 0 auto 32px; max-width: 460px; padding: 22px 24px; border-radius: 16px;
     border: 1px solid rgba(150,167,219,0.14);
     background: linear-gradient(165deg, rgba(16,23,51,0.5), rgba(5,7,15,0.45));
   }
-  .unlock-summary-title {
+  .info-card-title {
     font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--orange-bright); margin-bottom: 14px; text-align: left;
   }
-  .unlock-summary-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .unlock-summary-list li {
+  .info-card-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .info-card-list li {
     display: flex; align-items: flex-start; gap: 10px; text-align: left;
     font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.5; color: var(--cream-dim); font-weight: 300;
   }
-  .unlock-summary-list .mark {
+  .info-card-list .mark {
     flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; margin-top: 1px;
     background: rgba(255,126,32,0.12); border: 1px solid var(--border-orange); color: var(--orange-bright);
     display: flex; align-items: center; justify-content: center; font-size: 10px;
@@ -405,10 +364,7 @@ gtag('event', 'view_pagina_agenda');
     </div>
   </div>
 
-  <div class="agenda-progress-track"><div class="agenda-progress-bar" id="progressBar"></div></div>
-
-  <button type="button" class="btn-primary agenda-cta" id="agendaBtn" disabled>Agenda tu sesión de claridad</button>
-  <p class="agenda-hint" id="agendaHint">En un momento podrás separar tu sesión →</p>
+  <button type="button" class="btn-primary agenda-cta" id="agendaBtn">Agenda tu sesión de claridad</button>
 
   <!-- Widget de Calendly embebido — oculto hasta que se hace clic en
        "Agenda tu sesión de claridad"; openCalendly() (definido en el
@@ -418,12 +374,24 @@ gtag('event', 'view_pagina_agenda');
   </div>
 </section>
 
-<!-- ============ SE DESBLOQUEA AL 50% DEL VIDEO ============ -->
-<div class="unlock-section" id="unlockSection" hidden>
+<!-- ============ SIEMPRE VISIBLE: nada queda oculto esperando una
+     acción — el video es opcional, no bloquea nada de lo de acá abajo
+     ============ -->
+<div class="below-fold">
   <div class="section section-narrow">
-    <div class="unlock-summary">
-      <div class="unlock-summary-title">Qué vas a trabajar</div>
-      <ul class="unlock-summary-list">
+    <div class="info-card">
+      <div class="info-card-title">Qué vas a obtener en la sesión</div>
+      <ul class="info-card-list">
+        <li><span class="mark">✓</span>Un diagnóstico honesto de qué está frenando tu alto desempeño ahora mismo</li>
+        <li><span class="mark">✓</span>Claridad sobre si Evolution es el momento y el programa correcto para ti</li>
+        <li><span class="mark">✓</span>Respuesta directa a tus dudas específicas — sin script, conversación real con Erick</li>
+        <li><span class="mark">✓</span>Un plan concreto de siguiente paso, decidas o no inscribirte</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-title">Qué vas a trabajar</div>
+      <ul class="info-card-list">
         <li><span class="mark">✓</span>8 semanas en vivo con el psicoterapeuta Erick Castellano y tu grupo</li>
         <li><span class="mark">✓</span>Tu Mapa de Propósito y tu Plan Personal de Disciplina</li>
         <li><span class="mark">✓</span>Ejercicios prácticos cada semana, aplicados a tu vida real</li>
@@ -447,12 +415,14 @@ gtag('event', 'view_pagina_agenda');
 </div>
 
 <script>
-  // ===== Reproductor de YouTube + progreso real + desbloqueos =====
+  // ===== Reproductor de YouTube + tracking de progreso =====
   // Mismo patrón de reproductor que el resto del sitio (autoplay mudo →
-  // 1er clic reinicia con sonido → clics siguientes pausan/reproducen),
-  // con tracking de progreso agregado encima. El progreso SOLO se mide
-  // después de que la persona arrancó el video de verdad (started=true)
-  // — el preview mudo en loop antes de eso no cuenta como "viendo".
+  // 1er clic reinicia con sonido → clics siguientes pausan/reproducen).
+  // El video es opcional — no bloquea el botón de agendar ni ningún
+  // contenido de la página; el tracking de progreso queda solo como dato
+  // (video_progreso en GA4). Se mide después de que la persona arrancó el
+  // video de verdad (started=true) — el preview mudo en loop antes de eso
+  // no cuenta como "viendo".
   (function () {
     const VIDEO_ID = 'NvRF-YXbIdo';
 
@@ -470,72 +440,21 @@ gtag('event', 'view_pagina_agenda');
       img.src = 'https://i.ytimg.com/vi/' + VIDEO_ID + '/maxresdefault.jpg';
     })();
 
-    // Primer tramo del video (0–13% real) donde la barra avanza más
-    // rápido que el tiempo real; de ahí en adelante, 1:1 con el tiempo
-    // real. PROGRESS_EASE_POWER < 1 hace que la barra "adelante" fuerte
-    // al principio y se acerque suave a la diagonal real justo en el
-    // punto de quiebre (sin salto visual: en t=BREAKPOINT ambas curvas
-    // coinciden exactamente).
-    const PROGRESS_BREAKPOINT = 0.13;
-    const PROGRESS_EASE_POWER = 0.3;
-
-    const UNLOCK_BUTTON_AT = 0.25;
-    const UNLOCK_SECTION_AT = 0.5;
+    // El botón ya no depende del video — sigue siendo útil saber cuánta
+    // gente ve cuánto del video, así que estos eventos de GA4 se quedan,
+    // solo como dato (no bloquean ni desbloquean nada).
     const THRESHOLDS = [0.25, 0.5, 0.75, 1];
     const firedThresholds = {};
 
-    const progressBar = document.getElementById('progressBar');
     const agendaBtn = document.getElementById('agendaBtn');
-    const agendaHint = document.getElementById('agendaHint');
-    const unlockSection = document.getElementById('unlockSection');
 
-    let buttonUnlocked = false;
-    let sectionUnlocked = false;
-
-    function mapBarProgress(real) {
-      if (real <= 0) return 0;
-      if (real >= PROGRESS_BREAKPOINT) return Math.min(real, 1);
-      return PROGRESS_BREAKPOINT * Math.pow(real / PROGRESS_BREAKPOINT, PROGRESS_EASE_POWER);
-    }
-
-    function handleThresholds(real) {
+    function updateProgress(real) {
       THRESHOLDS.forEach(function (t) {
         if (!firedThresholds[t] && real >= t - 0.001) {
           firedThresholds[t] = true;
           gtag('event', 'video_progreso', { porcentaje: Math.round(t * 100) });
         }
       });
-    }
-
-    function unlockButton() {
-      if (buttonUnlocked) return;
-      buttonUnlocked = true;
-      agendaBtn.disabled = false;
-      agendaBtn.classList.add('unlocked');
-      agendaHint.classList.add('is-hidden');
-    }
-
-    function unlockSectionContent() {
-      if (sectionUnlocked) return;
-      sectionUnlocked = true;
-      unlockSection.hidden = false;
-      // Doble rAF: deja que el navegador aplique display:block primero,
-      // para que la transición de opacity/transform sí se anime (si se
-      // agrega la clase en el mismo frame que se quita [hidden], el
-      // navegador puede saltarse la transición).
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          unlockSection.classList.add('visible');
-        });
-      });
-    }
-
-    function updateProgress(real) {
-      const bar = mapBarProgress(real);
-      progressBar.style.width = (bar * 100) + '%';
-      handleThresholds(real);
-      if (real >= UNLOCK_BUTTON_AT) unlockButton();
-      if (real >= UNLOCK_SECTION_AT) unlockSectionContent();
     }
 
     let apiReadyPromise = null;
@@ -643,9 +562,9 @@ gtag('event', 'view_pagina_agenda');
 
     loadYouTubeApi().then(initPlayer);
 
-    // ===== Botón real de agendar =====
+    // ===== Botón de agendar — disponible desde que carga la página,
+    // sin depender del video. =====
     agendaBtn.addEventListener('click', function () {
-      if (agendaBtn.disabled) return;
       fbq('track', 'Lead');
       gtag('event', 'click_agendar_claridad');
       openCalendly();
