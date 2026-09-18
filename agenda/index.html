@@ -100,7 +100,7 @@ gtag('event', 'view_pagina_agenda');
 
   /* Logo mínimo — sin nav ni CTAs extra, esta página tiene un único
      objetivo y un único botón. Va adentro de .fold (ver HTML). */
-  .agenda-logo { font-weight: 800; font-size: 14px; letter-spacing: -0.01em; color: var(--cream); margin-bottom: 20px; }
+  .agenda-logo { font-weight: 800; font-size: 14px; letter-spacing: -0.01em; color: var(--cream); margin-bottom: 16px; }
   .agenda-logo .accent { color: var(--orange-bright); }
 
   /* ===== FOLD — todo lo esencial (titular, video, barra, botón) debe
@@ -112,18 +112,25 @@ gtag('event', 'view_pagina_agenda');
     min-height: 100vh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center;
-    max-width: 900px;
+    max-width: 940px;
     margin: 0 auto;
-    padding: 24px 24px 28px;
+    /* padding-top explícito y más grande que el bottom — así el titular
+       siempre tiene aire arriba aunque el centrado vertical quede muy
+       ajustado (viewports reales con chrome de navegador, no el 100vh
+       "ideal" de un iframe de prueba). */
+    padding: 32px 24px 20px;
   }
 
+  /* El titular ahora es más largo (2 frases) — clamp() más chico en el
+     máximo (40 vs 44) y max-width más ancho (860 vs 720) para que entre
+     en 2-3 líneas sin desbordar el alto disponible en 1440x900. */
   h1 {
-    font-size: clamp(26px, 4.2vw, 44px);
-    line-height: 1.12;
+    font-size: clamp(24px, 4.5vw, 40px);
+    line-height: 1.16;
     font-weight: 800;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.025em;
     text-wrap: balance;
-    max-width: 720px;
+    max-width: 860px;
     margin: 0 auto;
   }
   h1 .accent { color: var(--orange-bright); text-shadow: 0 0 40px rgba(255,126,32,0.35); }
@@ -131,10 +138,10 @@ gtag('event', 'view_pagina_agenda');
   .agenda-sub {
     font-family: 'Inter', sans-serif;
     font-weight: 300;
-    font-size: clamp(14px, 1.6vw, 16px);
-    line-height: 1.55;
+    font-size: clamp(13.5px, 1.5vw, 15.5px);
+    line-height: 1.5;
     color: var(--steel);
-    max-width: 480px;
+    max-width: 620px;
     margin: 14px auto 0;
   }
 
@@ -142,8 +149,10 @@ gtag('event', 'view_pagina_agenda');
        existe en el resto del sitio (autoplay mudo → 1er clic reinicia
        con sonido → clics siguientes pausan/reproducen). El ancho usa
        vh además de vw/px a propósito: así, si el viewport es bajo (poca
-       altura), el video se achica solo para no forzar scroll. ===== */
-  .hero-video { width: min(760px, 88vw, 78vh); margin: 22px auto 0; }
+       altura), el video se achica solo para no forzar scroll — el tope
+       de 72vh (antes 78) deja más margen para el titular, que ahora es
+       más largo. ===== */
+  .hero-video { width: min(760px, 88vw, 72vh); margin: 18px auto 0; }
   .hero-video-inner {
     position: relative; width: 100%; padding-bottom: 56.25%;
     border-radius: 16px; overflow: hidden;
@@ -178,8 +187,8 @@ gtag('event', 'view_pagina_agenda');
        mapBarProgress() en el script: en el primer tramo avanza más
        rápido que el tiempo real, después queda 1:1. ===== */
   .agenda-progress-track {
-    width: min(760px, 88vw, 78vh); height: 6px; border-radius: 6px;
-    background: rgba(150,167,219,0.14); overflow: hidden; margin: 14px auto 0;
+    width: min(760px, 88vw, 72vh); height: 6px; border-radius: 6px;
+    background: rgba(150,167,219,0.14); overflow: hidden; margin: 12px auto 0;
   }
   .agenda-progress-bar {
     height: 100%; width: 0%;
@@ -202,7 +211,7 @@ gtag('event', 'view_pagina_agenda');
   /* Bloqueado hasta el 25% del video — opacidad reducida + cursor
      not-allowed en vez de solo ocultarlo, para que la persona entienda
      que el botón existe pero todavía no está disponible. */
-  .agenda-cta { margin-top: 20px; }
+  .agenda-cta { margin-top: 16px; }
   .agenda-cta:disabled {
     opacity: 0.38; cursor: not-allowed; filter: grayscale(0.4); box-shadow: none; transform: none !important;
   }
@@ -217,7 +226,7 @@ gtag('event', 'view_pagina_agenda');
 
   .agenda-hint {
     font-family: 'Inter', sans-serif; font-size: 12px; color: var(--steel-dim);
-    margin-top: 10px; transition: opacity 0.3s ease, margin 0.3s ease, height 0.3s ease;
+    margin-top: 8px; transition: opacity 0.3s ease, margin 0.3s ease, height 0.3s ease;
   }
   .agenda-hint.is-hidden { opacity: 0; height: 0; margin-top: 0; overflow: hidden; }
 
@@ -296,8 +305,8 @@ gtag('event', 'view_pagina_agenda');
      y empujar el resto por debajo de una pantalla. -->
 <section class="fold">
   <div class="agenda-logo">Evolution<span class="accent">.</span></div>
-  <h1>Mira esto antes de agendar.<br><span class="accent">Va a cambiar cómo ves tu desempeño.</span></h1>
-  <p class="agenda-sub">Son solo unos minutos — pero vas a ver el patrón exacto que probablemente te está frenando, antes de decidir el siguiente paso.</p>
+  <h1>Para profesionales que quieren llegar al alto desempeño<br><span class="accent">sin quemarse, sin ansiedad y sin estrés.</span></h1>
+  <p class="agenda-sub">En los próximos minutos vas a identificar el patrón exacto que te está costando más energía de la que ves — que hace que te exijas mientras nunca te sientes suficiente (y qué hacer con eso).</p>
 
   <div class="hero-video">
     <div class="hero-video-inner">
@@ -313,7 +322,7 @@ gtag('event', 'view_pagina_agenda');
   <div class="agenda-progress-track"><div class="agenda-progress-bar" id="progressBar"></div></div>
 
   <button type="button" class="btn-primary agenda-cta" id="agendaBtn" disabled>Agenda tu sesión de claridad</button>
-  <p class="agenda-hint" id="agendaHint">Se habilita al 25% del video</p>
+  <p class="agenda-hint" id="agendaHint">En un momento podrás separar tu sesión →</p>
 </section>
 
 <!-- ============ SE DESBLOQUEA AL 50% DEL VIDEO ============ -->
