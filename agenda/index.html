@@ -463,7 +463,7 @@ gtag('event', 'view_pagina_agenda');
         videoId: VIDEO_ID,
         playerVars: {
           autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: VIDEO_ID,
-          playsinline: 1, rel: 0, modestbranding: 1, cc_load_policy: 0
+          playsinline: 1, rel: 0, modestbranding: 1, cc_load_policy: 0, hl: 'es'
         },
         events: {
           onReady: function (e) {
@@ -500,6 +500,11 @@ gtag('event', 'view_pagina_agenda');
           player.unMute();
           player.seekTo(0);
           player.playVideo();
+          // Mejor esfuerzo, no garantizado — YouTube deprecó el parámetro
+          // 'vq' de URL para forzar calidad, así que esto es lo más
+          // cercano: pedirle 1080p a la IFrame API. YouTube puede
+          // ignorarlo según el ancho de banda de quien mira.
+          player.setPlaybackQuality('hd1080');
           return;
         }
         if (player.getPlayerState() === YT.PlayerState.PLAYING) {
