@@ -38,12 +38,38 @@ fbq('track', 'ViewContent', {content_name: 'Agenda Directa Evolution'});
 gtag('event', 'view_pagina_agenda');
 </script>
 
-<!-- Calendly (popup) -->
+<!-- Calendly (widget embebido en la página, no popup) -->
 <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
 <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 <script type="text/javascript">
+  // Despliega el widget de Calendly directamente en la página (adentro de
+  // #calendlyInlineWidget) en vez de abrirlo como popup. Recién arma el
+  // iframe la primera vez que se llama (no de entrada, para no cargarlo
+  // en cada visita) — llamadas siguientes solo hacen scroll. widget.js se
+  // carga async en el <head>, así que si todavía no terminó de cargar
+  // cuando alguien hace clic, reintenta cada 150ms hasta que
+  // window.Calendly exista.
+  let calendlyInlineReady = false;
   function openCalendly() {
-    Calendly.initPopupWidget({url: 'https://calendly.com/emaromero-lamb/evolution'});
+    const wrap = document.getElementById('calendlyInlineWrap');
+    if (!wrap) return false;
+    wrap.hidden = false;
+
+    if (!calendlyInlineReady) {
+      (function initWhenReady() {
+        if (window.Calendly) {
+          calendlyInlineReady = true;
+          Calendly.initInlineWidget({
+            url: 'https://calendly.com/emaromero-lamb/evolution',
+            parentElement: document.getElementById('calendlyInlineWidget')
+          });
+        } else {
+          setTimeout(initWhenReady, 150);
+        }
+      })();
+    }
+
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return false;
   }
 </script>
@@ -201,7 +227,16 @@ gtag('event', 'view_pagina_agenda');
        siga llegando a .yt-click-catcher (z-index más bajo) por debajo. */
     pointer-events: none;
   }
+  /* Miniatura real del video (i.ytimg.com, imagen estática — no carga
+     nada de YouTube todavía) detrás del ícono de play propio. Sin esto
+     el póster quedaba como un rectángulo navy liso: en desktop pasaba
+     desapercibido porque el autoplay mudo casi siempre arranca y el
+     póster desaparece enseguida, pero en mobile (donde el autoplay mudo
+     es poco confiable, sobre todo en iOS) el póster se queda puesto y
+     el rectángulo vacío se nota. */
+  .yt-poster-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .yt-poster span {
+    position: relative;
     width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
     background: rgba(255,126,32,0.16); border: 1px solid var(--border-orange); color: var(--orange-bright);
     font-size: 22px; padding-left: 4px;
@@ -254,6 +289,21 @@ gtag('event', 'view_pagina_agenda');
     margin-top: 8px; transition: opacity 0.3s ease, margin 0.3s ease, height 0.3s ease;
   }
   .agenda-hint.is-hidden { opacity: 0; height: 0; margin-top: 0; overflow: hidden; }
+
+  /* Widget de Calendly embebido en la página */
+  .calendly-inline-wrap {
+    margin-top: 24px; width: min(760px, 88vw); margin-left: auto; margin-right: auto;
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(150,167,219,0.18); background: var(--navy-mid);
+  }
+  .calendly-inline-wrap[hidden] { display: none; }
+  /* Ojo: a propósito NO se llama "calendly-inline-widget" — ese nombre de
+     clase lo escanea automáticamente widget.js buscando un data-url; como
+     este contenedor lo llenamos nosotros vía Calendly.initInlineWidget(),
+     si tuviera esa clase el auto-scan de Calendly intentaría inicializarlo
+     también él solo, sin data-url, y tira un error ("Cannot read
+     properties of null (reading 'split')") que rompe el widget.js. */
+  .claridad-calendly-target { width: 100%; min-width: 320px; height: 700px; }
 
   /* ===== Contenido que se desbloquea al 50% — hidden real (no ocupa
        espacio) hasta ese punto, para no generar scroll de más mientras
@@ -347,7 +397,10 @@ gtag('event', 'view_pagina_agenda');
         <div class="yt-click-catcher"></div>
         <div class="yt-mute-badge">🔇 Toca para activar el sonido</div>
         <div class="yt-pause-icon"><span>▶</span></div>
-        <div class="yt-poster" id="ytPoster"><span>▶</span></div>
+        <div class="yt-poster" id="ytPoster">
+          <img class="yt-poster-img" id="ytPosterImg" alt="">
+          <span>▶</span>
+        </div>
       </div>
     </div>
   </div>
@@ -356,6 +409,13 @@ gtag('event', 'view_pagina_agenda');
 
   <button type="button" class="btn-primary agenda-cta" id="agendaBtn" disabled>Agenda tu sesión de claridad</button>
   <p class="agenda-hint" id="agendaHint">En un momento podrás separar tu sesión →</p>
+
+  <!-- Widget de Calendly embebido — oculto hasta que se hace clic en
+       "Agenda tu sesión de claridad"; openCalendly() (definido en el
+       <head>) lo arma recién la primera vez y lo muestra. -->
+  <div id="calendlyInlineWrap" class="calendly-inline-wrap" hidden>
+    <div id="calendlyInlineWidget" class="claridad-calendly-target"></div>
+  </div>
 </section>
 
 <!-- ============ SE DESBLOQUEA AL 50% DEL VIDEO ============ -->
@@ -395,6 +455,20 @@ gtag('event', 'view_pagina_agenda');
   // — el preview mudo en loop antes de eso no cuenta como "viendo".
   (function () {
     const VIDEO_ID = 'NvRF-YXbIdo';
+
+    // Miniatura real detrás del ícono de play — imagen estática de
+    // i.ytimg.com, no dispara ninguna carga de YouTube todavía.
+    // maxresdefault no existe para todos los videos; si falla, cae a
+    // hqdefault, que YouTube garantiza siempre.
+    (function loadPosterThumbnail() {
+      const img = document.getElementById('ytPosterImg');
+      if (!img) return;
+      img.onerror = function () {
+        img.onerror = null;
+        img.src = 'https://i.ytimg.com/vi/' + VIDEO_ID + '/hqdefault.jpg';
+      };
+      img.src = 'https://i.ytimg.com/vi/' + VIDEO_ID + '/maxresdefault.jpg';
+    })();
 
     // Primer tramo del video (0–13% real) donde la barra avanza más
     // rápido que el tiempo real; de ahí en adelante, 1:1 con el tiempo
